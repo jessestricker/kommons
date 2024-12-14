@@ -1,23 +1,19 @@
 package kommons
 
-import kommons.internal.buildHashCodeOfRange
-import kommons.internal.checkEqualsInRange
 import kommons.internal.requireIndex
-import kommons.internal.size
 
 /** An immutable array of bytes. */
 public class ImmutableByteArray
 internal constructor(
     internal val data: ByteArray,
-    internal val dataRange: IntRange = data.indices,
+    internal val dataStart: Int = 0,
+    internal val dataEnd: Int = data.size,
 ) {
-    internal companion object {
-        val EMPTY = ImmutableByteArray(ByteArray(0))
-    }
+    // 0 <= dataStart <= dataEnd <= data.size
 
     /** The number of elements. */
     public val size: Int
-        get() = dataRange.size
+        get() = dataEnd - dataStart
 
     /**
      * Returns the element at the given [index].
@@ -26,16 +22,16 @@ internal constructor(
      */
     public operator fun get(index: Int): Byte {
         requireIndex(index, size)
-        return data[dataRange.first + index]
+        return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
     public operator fun iterator(): ByteIterator {
         return object : ByteIterator() {
-            private var dataIndex = dataRange.first
+            private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
-                return dataIndex <= dataRange.last
+                return dataIndex < dataEnd
             }
 
             override fun nextByte(): Byte {
@@ -51,14 +47,11 @@ internal constructor(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ImmutableByteArray
-        if (data === other.data && dataRange == other.dataRange) return true
-        return checkEqualsInRange(dataRange, other.dataRange) { index, otherIndex ->
-            data[index] == other.data[otherIndex]
-        }
+        return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
     override fun hashCode(): Int {
-        return buildHashCodeOfRange(dataRange) { index -> data[index].toInt() }
+        return data.contentHashCode(dataStart, dataEnd)
     }
 
     override fun toString(): String {
@@ -67,14 +60,10 @@ internal constructor(
 }
 
 /**
- * Creates an immutable array of bytes of the given [size], with every element initialized to `0`.
+ * Creates an immutable array of bytes of the given [size], with every element initialized to zero.
  */
 public fun ImmutableByteArray(size: Int): ImmutableByteArray {
-    return if (size == 0) {
-        ImmutableByteArray.EMPTY
-    } else {
-        ImmutableByteArray(ByteArray(size))
-    }
+    return ImmutableByteArray(ByteArray(size))
 }
 
 /**
@@ -82,51 +71,37 @@ public fun ImmutableByteArray(size: Int): ImmutableByteArray {
  * given [init] function.
  */
 public fun ImmutableByteArray(size: Int, init: (index: Int) -> Byte): ImmutableByteArray {
-    return if (size == 0) {
-        ImmutableByteArray.EMPTY
-    } else {
-        ImmutableByteArray(ByteArray(size, init))
-    }
+    return ImmutableByteArray(ByteArray(size, init))
 }
 
 /** Creates a new immutable array of bytes which contains the given [elements]. */
 public fun immutableByteArrayOf(vararg elements: Byte): ImmutableByteArray {
-    return if (elements.isEmpty()) {
-        ImmutableByteArray.EMPTY
-    } else {
-        ImmutableByteArray(elements)
-    }
+    return ImmutableByteArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
 public fun ByteArray.toImmutableArray(): ImmutableByteArray {
-    return if (isEmpty()) {
-        ImmutableByteArray.EMPTY
-    } else {
-        ImmutableByteArray(this.copyOf())
-    }
+    return ImmutableByteArray(this.copyOf())
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from given [startIndex]
+ * (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws[IndexOutOfBoundsException] if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableByteArray.size].
  */
-public fun ByteArray.toImmutableArray(range: IntRange): ImmutableByteArray {
-    return if (range.isEmpty()) {
-        ImmutableByteArray.EMPTY
-    } else {
-        ImmutableByteArray(this.copyOfRange(range.first, range.last + 1))
-    }
+public fun ByteArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableByteArray {
+    return ImmutableByteArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
 public val ImmutableByteArray.indices: IntRange
-    get() = 0..lastIndex
+    get() = 0..<size
 
 /** The last valid index. */
 public val ImmutableByteArray.lastIndex: Int
-    get() = dataRange.last - dataRange.first
+    get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableByteArray.asList(): List<Byte> {
@@ -150,31 +125,33 @@ public operator fun ImmutableByteArray.contains(element: Byte): Boolean {
  * does not contain the given value.
  */
 public fun ImmutableByteArray.indexOf(value: Byte): Int {
-    for (dataIndex in dataRange) {
+    for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
-            return dataIndex - dataRange.first
+            return dataIndex - dataStart
         }
     }
     return -1
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws IndexOutOfBoundsException if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableByteArray.size].
  */
-public fun ImmutableByteArray.subArray(range: IntRange): ImmutableByteArray {
-    requireIndex(range.first, size)
-    requireIndex(range.last, size)
-    return if (range.isEmpty()) {
-        return ImmutableByteArray.EMPTY
-    } else {
-        val subDataRange = (dataRange.first + range.first)..(dataRange.first + range.last)
-        ImmutableByteArray(data, subDataRange)
+public fun ImmutableByteArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableByteArray {
+    // 0 <= startIndex <= endIndex <= size
+    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
+    require(startIndex <= endIndex) {
+        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
     }
+    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
+
+    return ImmutableByteArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
 public fun ImmutableByteArray.toMutableArray(): ByteArray {
-    return data.copyOfRange(dataRange.first, dataRange.last + 1)
+    return data.copyOfRange(dataStart, dataEnd)
 }

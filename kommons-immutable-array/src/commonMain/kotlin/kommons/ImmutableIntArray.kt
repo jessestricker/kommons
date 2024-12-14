@@ -1,20 +1,19 @@
 package kommons
 
-import kommons.internal.buildHashCodeOfRange
-import kommons.internal.checkEqualsInRange
 import kommons.internal.requireIndex
-import kommons.internal.size
 
 /** An immutable array of ints. */
 public class ImmutableIntArray
-internal constructor(internal val data: IntArray, internal val dataRange: IntRange = data.indices) {
-    internal companion object {
-        val EMPTY = ImmutableIntArray(IntArray(0))
-    }
+internal constructor(
+    internal val data: IntArray,
+    internal val dataStart: Int = 0,
+    internal val dataEnd: Int = data.size,
+) {
+    // 0 <= dataStart <= dataEnd <= data.size
 
     /** The number of elements. */
     public val size: Int
-        get() = dataRange.size
+        get() = dataEnd - dataStart
 
     /**
      * Returns the element at the given [index].
@@ -23,16 +22,16 @@ internal constructor(internal val data: IntArray, internal val dataRange: IntRan
      */
     public operator fun get(index: Int): Int {
         requireIndex(index, size)
-        return data[dataRange.first + index]
+        return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
     public operator fun iterator(): IntIterator {
         return object : IntIterator() {
-            private var dataIndex = dataRange.first
+            private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
-                return dataIndex <= dataRange.last
+                return dataIndex < dataEnd
             }
 
             override fun nextInt(): Int {
@@ -48,14 +47,11 @@ internal constructor(internal val data: IntArray, internal val dataRange: IntRan
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ImmutableIntArray
-        if (data === other.data && dataRange == other.dataRange) return true
-        return checkEqualsInRange(dataRange, other.dataRange) { index, otherIndex ->
-            data[index] == other.data[otherIndex]
-        }
+        return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
     override fun hashCode(): Int {
-        return buildHashCodeOfRange(dataRange) { index -> data[index] }
+        return data.contentHashCode(dataStart, dataEnd)
     }
 
     override fun toString(): String {
@@ -64,14 +60,10 @@ internal constructor(internal val data: IntArray, internal val dataRange: IntRan
 }
 
 /**
- * Creates an immutable array of ints of the given [size], with every element initialized to `0`.
+ * Creates an immutable array of ints of the given [size], with every element initialized to zero.
  */
 public fun ImmutableIntArray(size: Int): ImmutableIntArray {
-    return if (size == 0) {
-        ImmutableIntArray.EMPTY
-    } else {
-        ImmutableIntArray(IntArray(size))
-    }
+    return ImmutableIntArray(IntArray(size))
 }
 
 /**
@@ -79,51 +71,37 @@ public fun ImmutableIntArray(size: Int): ImmutableIntArray {
  * given [init] function.
  */
 public fun ImmutableIntArray(size: Int, init: (index: Int) -> Int): ImmutableIntArray {
-    return if (size == 0) {
-        ImmutableIntArray.EMPTY
-    } else {
-        ImmutableIntArray(IntArray(size, init))
-    }
+    return ImmutableIntArray(IntArray(size, init))
 }
 
 /** Creates a new immutable array of ints which contains the given [elements]. */
 public fun immutableIntArrayOf(vararg elements: Int): ImmutableIntArray {
-    return if (elements.isEmpty()) {
-        ImmutableIntArray.EMPTY
-    } else {
-        ImmutableIntArray(elements)
-    }
+    return ImmutableIntArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
 public fun IntArray.toImmutableArray(): ImmutableIntArray {
-    return if (isEmpty()) {
-        ImmutableIntArray.EMPTY
-    } else {
-        ImmutableIntArray(this.copyOf())
-    }
+    return ImmutableIntArray(this.copyOf())
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from given [startIndex]
+ * (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws[IndexOutOfBoundsException] if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableIntArray.size].
  */
-public fun IntArray.toImmutableArray(range: IntRange): ImmutableIntArray {
-    return if (range.isEmpty()) {
-        ImmutableIntArray.EMPTY
-    } else {
-        ImmutableIntArray(this.copyOfRange(range.first, range.last + 1))
-    }
+public fun IntArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableIntArray {
+    return ImmutableIntArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
 public val ImmutableIntArray.indices: IntRange
-    get() = 0..lastIndex
+    get() = 0..<size
 
 /** The last valid index. */
 public val ImmutableIntArray.lastIndex: Int
-    get() = dataRange.last - dataRange.first
+    get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableIntArray.asList(): List<Int> {
@@ -147,31 +125,33 @@ public operator fun ImmutableIntArray.contains(element: Int): Boolean {
  * does not contain the given value.
  */
 public fun ImmutableIntArray.indexOf(value: Int): Int {
-    for (dataIndex in dataRange) {
+    for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
-            return dataIndex - dataRange.first
+            return dataIndex - dataStart
         }
     }
     return -1
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws IndexOutOfBoundsException if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableIntArray.size].
  */
-public fun ImmutableIntArray.subArray(range: IntRange): ImmutableIntArray {
-    requireIndex(range.first, size)
-    requireIndex(range.last, size)
-    return if (range.isEmpty()) {
-        return ImmutableIntArray.EMPTY
-    } else {
-        val subDataRange = (dataRange.first + range.first)..(dataRange.first + range.last)
-        ImmutableIntArray(data, subDataRange)
+public fun ImmutableIntArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableIntArray {
+    // 0 <= startIndex <= endIndex <= size
+    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
+    require(startIndex <= endIndex) {
+        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
     }
+    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
+
+    return ImmutableIntArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
 public fun ImmutableIntArray.toMutableArray(): IntArray {
-    return data.copyOfRange(dataRange.first, dataRange.last + 1)
+    return data.copyOfRange(dataStart, dataEnd)
 }

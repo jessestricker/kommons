@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 class ImmutableLongArrayTest {
     @Test
     fun indexOf() {
-        val array = longArrayOf(9, 10, 11, 12, 13).toImmutableArray(1..3)
+        val array = longArrayOf(9, 10, 11, 12, 13).toImmutableArray(1, 4)
 
         assertEquals(-1, array.indexOf(8))
         assertEquals(-1, array.indexOf(9))
@@ -25,7 +25,7 @@ class ImmutableLongArrayTest {
 
     @Test
     fun contains() {
-        val array = longArrayOf(9, 10, 11, 12, 13).toImmutableArray(1..3)
+        val array = longArrayOf(9, 10, 11, 12, 13).toImmutableArray(1, 4)
 
         assertFalse { array.contains(8) }
         assertFalse { array.contains(9) }
@@ -39,96 +39,80 @@ class ImmutableLongArrayTest {
     }
 
     @Test
-    fun `subArray WITH full range`() {
+    fun `sliceArray WITH full range`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        val subArray = array.subArray(0..4)
+        val sliceArray = array.sliceArray(0, 5)
 
-        assertSame(array.data, subArray.data)
-        assertEquals(0, subArray.dataRange.first)
-        assertEquals(4, subArray.dataRange.last)
+        assertSame(array.data, sliceArray.data)
+        assertEquals(0, sliceArray.dataStart)
+        assertEquals(5, sliceArray.dataEnd)
     }
 
     @Test
-    fun `subArray WITH first one greater`() {
+    fun `sliceArray WITH first one greater`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        val subArray = array.subArray(1..4)
+        val sliceArray = array.sliceArray(1, 5)
 
-        assertSame(array.data, subArray.data)
-        assertEquals(1, subArray.dataRange.first)
-        assertEquals(4, subArray.dataRange.last)
+        assertSame(array.data, sliceArray.data)
+        assertEquals(1, sliceArray.dataStart)
+        assertEquals(5, sliceArray.dataEnd)
     }
 
     @Test
-    fun `subArray WITH last one less`() {
+    fun `sliceArray WITH last one less`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        val subArray = array.subArray(0..3)
+        val sliceArray = array.sliceArray(0, 4)
 
-        assertSame(array.data, subArray.data)
-        assertEquals(0, subArray.dataRange.first)
-        assertEquals(3, subArray.dataRange.last)
+        assertSame(array.data, sliceArray.data)
+        assertEquals(0, sliceArray.dataStart)
+        assertEquals(4, sliceArray.dataEnd)
     }
 
     @Test
-    fun `subArray WITH first one greater AND last one less`() {
+    fun `sliceArray WITH first one greater AND last one less`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        val subArray = array.subArray(1..3)
+        val sliceArray = array.sliceArray(1, 4)
 
-        assertSame(array.data, subArray.data)
-        assertEquals(1, subArray.dataRange.first)
-        assertEquals(3, subArray.dataRange.last)
+        assertSame(array.data, sliceArray.data)
+        assertEquals(1, sliceArray.dataStart)
+        assertEquals(4, sliceArray.dataEnd)
     }
 
     @Test
-    fun `subArray WITH singleton range`() {
+    fun `sliceArray WITH singleton range`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        val subArray = array.subArray(2..2)
+        val sliceArray = array.sliceArray(2, 3)
 
-        assertSame(array.data, subArray.data)
-        assertEquals(2, subArray.dataRange.first)
-        assertEquals(2, subArray.dataRange.last)
+        assertSame(array.data, sliceArray.data)
+        assertEquals(2, sliceArray.dataStart)
+        assertEquals(3, sliceArray.dataEnd)
     }
 
     @Test
-    fun `subArray WITH empty range`() {
+    fun `sliceArray WITH empty range`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        @Suppress("InvalidRange") val subArray = array.subArray(3..2)
+        val sliceArray = array.sliceArray(3, 3)
 
-        assertTrue { subArray.dataRange.isEmpty() }
+        assertTrue { sliceArray.dataStart >= sliceArray.dataEnd }
     }
 
     @Test
-    fun `subArray throws WHEN first too small`() {
+    fun `sliceArray throws WHEN first too small`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        assertFailsWith<IndexOutOfBoundsException> { array.subArray(-1..4) }
+        assertFailsWith<IllegalArgumentException> { array.sliceArray(-1, 5) }
     }
 
     @Test
-    fun `subArray throws WHEN first too large`() {
+    fun `sliceArray throws WHEN last too large`() {
         val array = immutableLongArrayOf(10, 11, 12, 13, 14)
 
-        assertFailsWith<IndexOutOfBoundsException> {
-            @Suppress("InvalidRange") array.subArray(5..4)
-        }
-    }
-
-    @Test
-    fun `subArray throws WHEN last too small`() {
-        val array = immutableLongArrayOf(10, 11, 12, 13, 14)
-
-        assertFailsWith<IndexOutOfBoundsException> { array.subArray(0..-1) }
-    }
-
-    @Test
-    fun `subArray throws WHEN last too large`() {
-        val array = immutableLongArrayOf(10, 11, 12, 13, 14)
-
-        assertFailsWith<IndexOutOfBoundsException> { array.subArray(0..5) }
+        assertFailsWith<IllegalArgumentException> { array.sliceArray(0, 6) }
     }
 }

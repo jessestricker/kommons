@@ -1,23 +1,19 @@
 package kommons
 
-import kommons.internal.buildHashCodeOfRange
-import kommons.internal.checkEqualsInRange
 import kommons.internal.requireIndex
-import kommons.internal.size
 
 /** An immutable array of booleans. */
 public class ImmutableBooleanArray
 internal constructor(
     internal val data: BooleanArray,
-    internal val dataRange: IntRange = data.indices,
+    internal val dataStart: Int = 0,
+    internal val dataEnd: Int = data.size,
 ) {
-    internal companion object {
-        val EMPTY = ImmutableBooleanArray(BooleanArray(0))
-    }
+    // 0 <= dataStart <= dataEnd <= data.size
 
     /** The number of elements. */
     public val size: Int
-        get() = dataRange.size
+        get() = dataEnd - dataStart
 
     /**
      * Returns the element at the given [index].
@@ -26,16 +22,16 @@ internal constructor(
      */
     public operator fun get(index: Int): Boolean {
         requireIndex(index, size)
-        return data[dataRange.first + index]
+        return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
     public operator fun iterator(): BooleanIterator {
         return object : BooleanIterator() {
-            private var dataIndex = dataRange.first
+            private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
-                return dataIndex <= dataRange.last
+                return dataIndex < dataEnd
             }
 
             override fun nextBoolean(): Boolean {
@@ -51,14 +47,11 @@ internal constructor(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ImmutableBooleanArray
-        if (data === other.data && dataRange == other.dataRange) return true
-        return checkEqualsInRange(dataRange, other.dataRange) { index, otherIndex ->
-            data[index] == other.data[otherIndex]
-        }
+        return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
     override fun hashCode(): Int {
-        return buildHashCodeOfRange(dataRange) { index -> if (data[index]) 1231 else 1237 }
+        return data.contentHashCode(dataStart, dataEnd)
     }
 
     override fun toString(): String {
@@ -71,11 +64,7 @@ internal constructor(
  * `false`.
  */
 public fun ImmutableBooleanArray(size: Int): ImmutableBooleanArray {
-    return if (size == 0) {
-        ImmutableBooleanArray.EMPTY
-    } else {
-        ImmutableBooleanArray(BooleanArray(size))
-    }
+    return ImmutableBooleanArray(BooleanArray(size))
 }
 
 /**
@@ -83,51 +72,37 @@ public fun ImmutableBooleanArray(size: Int): ImmutableBooleanArray {
  * given [init] function.
  */
 public fun ImmutableBooleanArray(size: Int, init: (index: Int) -> Boolean): ImmutableBooleanArray {
-    return if (size == 0) {
-        ImmutableBooleanArray.EMPTY
-    } else {
-        ImmutableBooleanArray(BooleanArray(size, init))
-    }
+    return ImmutableBooleanArray(BooleanArray(size, init))
 }
 
 /** Creates a new immutable array of booleans which contains the given [elements]. */
 public fun immutableBooleanArrayOf(vararg elements: Boolean): ImmutableBooleanArray {
-    return if (elements.isEmpty()) {
-        ImmutableBooleanArray.EMPTY
-    } else {
-        ImmutableBooleanArray(elements)
-    }
+    return ImmutableBooleanArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
 public fun BooleanArray.toImmutableArray(): ImmutableBooleanArray {
-    return if (isEmpty()) {
-        ImmutableBooleanArray.EMPTY
-    } else {
-        ImmutableBooleanArray(this.copyOf())
-    }
+    return ImmutableBooleanArray(this.copyOf())
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from given [startIndex]
+ * (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws[IndexOutOfBoundsException] if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableBooleanArray.size].
  */
-public fun BooleanArray.toImmutableArray(range: IntRange): ImmutableBooleanArray {
-    return if (range.isEmpty()) {
-        ImmutableBooleanArray.EMPTY
-    } else {
-        ImmutableBooleanArray(this.copyOfRange(range.first, range.last + 1))
-    }
+public fun BooleanArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableBooleanArray {
+    return ImmutableBooleanArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
 public val ImmutableBooleanArray.indices: IntRange
-    get() = 0..lastIndex
+    get() = 0..<size
 
 /** The last valid index. */
 public val ImmutableBooleanArray.lastIndex: Int
-    get() = dataRange.last - dataRange.first
+    get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableBooleanArray.asList(): List<Boolean> {
@@ -151,31 +126,33 @@ public operator fun ImmutableBooleanArray.contains(element: Boolean): Boolean {
  * does not contain the given value.
  */
 public fun ImmutableBooleanArray.indexOf(value: Boolean): Int {
-    for (dataIndex in dataRange) {
+    for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
-            return dataIndex - dataRange.first
+            return dataIndex - dataStart
         }
     }
     return -1
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws IndexOutOfBoundsException if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableBooleanArray.size].
  */
-public fun ImmutableBooleanArray.subArray(range: IntRange): ImmutableBooleanArray {
-    requireIndex(range.first, size)
-    requireIndex(range.last, size)
-    return if (range.isEmpty()) {
-        return ImmutableBooleanArray.EMPTY
-    } else {
-        val subDataRange = (dataRange.first + range.first)..(dataRange.first + range.last)
-        ImmutableBooleanArray(data, subDataRange)
+public fun ImmutableBooleanArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableBooleanArray {
+    // 0 <= startIndex <= endIndex <= size
+    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
+    require(startIndex <= endIndex) {
+        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
     }
+    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
+
+    return ImmutableBooleanArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
 public fun ImmutableBooleanArray.toMutableArray(): BooleanArray {
-    return data.copyOfRange(dataRange.first, dataRange.last + 1)
+    return data.copyOfRange(dataStart, dataEnd)
 }

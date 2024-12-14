@@ -1,23 +1,19 @@
 package kommons
 
-import kommons.internal.buildHashCodeOfRange
-import kommons.internal.checkEqualsInRange
 import kommons.internal.requireIndex
-import kommons.internal.size
 
 /** An immutable array of doubles. */
 public class ImmutableDoubleArray
 internal constructor(
     internal val data: DoubleArray,
-    internal val dataRange: IntRange = data.indices,
+    internal val dataStart: Int = 0,
+    internal val dataEnd: Int = data.size,
 ) {
-    internal companion object {
-        val EMPTY = ImmutableDoubleArray(DoubleArray(0))
-    }
+    // 0 <= dataStart <= dataEnd <= data.size
 
     /** The number of elements. */
     public val size: Int
-        get() = dataRange.size
+        get() = dataEnd - dataStart
 
     /**
      * Returns the element at the given [index].
@@ -26,16 +22,16 @@ internal constructor(
      */
     public operator fun get(index: Int): Double {
         requireIndex(index, size)
-        return data[dataRange.first + index]
+        return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
     public operator fun iterator(): DoubleIterator {
         return object : DoubleIterator() {
-            private var dataIndex = dataRange.first
+            private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
-                return dataIndex <= dataRange.last
+                return dataIndex < dataEnd
             }
 
             override fun nextDouble(): Double {
@@ -51,17 +47,11 @@ internal constructor(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ImmutableDoubleArray
-        if (data === other.data && dataRange == other.dataRange) return true
-        return checkEqualsInRange(dataRange, other.dataRange) { index, otherIndex ->
-            data[index] == other.data[otherIndex]
-        }
+        return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
     override fun hashCode(): Int {
-        return buildHashCodeOfRange(dataRange) { index ->
-            val bits = data[index].toBits()
-            (bits xor (bits ushr 32)).toInt()
-        }
+        return data.contentHashCode(dataStart, dataEnd)
     }
 
     override fun toString(): String {
@@ -71,14 +61,10 @@ internal constructor(
 
 /**
  * Creates an immutable array of doubles of the given [size], with every element initialized to
- * `0.0`.
+ * zero.
  */
 public fun ImmutableDoubleArray(size: Int): ImmutableDoubleArray {
-    return if (size == 0) {
-        ImmutableDoubleArray.EMPTY
-    } else {
-        ImmutableDoubleArray(DoubleArray(size))
-    }
+    return ImmutableDoubleArray(DoubleArray(size))
 }
 
 /**
@@ -86,51 +72,37 @@ public fun ImmutableDoubleArray(size: Int): ImmutableDoubleArray {
  * given [init] function.
  */
 public fun ImmutableDoubleArray(size: Int, init: (index: Int) -> Double): ImmutableDoubleArray {
-    return if (size == 0) {
-        ImmutableDoubleArray.EMPTY
-    } else {
-        ImmutableDoubleArray(DoubleArray(size, init))
-    }
+    return ImmutableDoubleArray(DoubleArray(size, init))
 }
 
 /** Creates a new immutable array of doubles which contains the given [elements]. */
 public fun immutableDoubleArrayOf(vararg elements: Double): ImmutableDoubleArray {
-    return if (elements.isEmpty()) {
-        ImmutableDoubleArray.EMPTY
-    } else {
-        ImmutableDoubleArray(elements)
-    }
+    return ImmutableDoubleArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
 public fun DoubleArray.toImmutableArray(): ImmutableDoubleArray {
-    return if (isEmpty()) {
-        ImmutableDoubleArray.EMPTY
-    } else {
-        ImmutableDoubleArray(this.copyOf())
-    }
+    return ImmutableDoubleArray(this.copyOf())
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from given [startIndex]
+ * (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws[IndexOutOfBoundsException] if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableDoubleArray.size].
  */
-public fun DoubleArray.toImmutableArray(range: IntRange): ImmutableDoubleArray {
-    return if (range.isEmpty()) {
-        ImmutableDoubleArray.EMPTY
-    } else {
-        ImmutableDoubleArray(this.copyOfRange(range.first, range.last + 1))
-    }
+public fun DoubleArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableDoubleArray {
+    return ImmutableDoubleArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
 public val ImmutableDoubleArray.indices: IntRange
-    get() = 0..lastIndex
+    get() = 0..<size
 
 /** The last valid index. */
 public val ImmutableDoubleArray.lastIndex: Int
-    get() = dataRange.last - dataRange.first
+    get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableDoubleArray.asList(): List<Double> {
@@ -154,31 +126,33 @@ public operator fun ImmutableDoubleArray.contains(element: Double): Boolean {
  * does not contain the given value.
  */
 public fun ImmutableDoubleArray.indexOf(value: Double): Int {
-    for (dataIndex in dataRange) {
+    for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
-            return dataIndex - dataRange.first
+            return dataIndex - dataStart
         }
     }
     return -1
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws IndexOutOfBoundsException if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableDoubleArray.size].
  */
-public fun ImmutableDoubleArray.subArray(range: IntRange): ImmutableDoubleArray {
-    requireIndex(range.first, size)
-    requireIndex(range.last, size)
-    return if (range.isEmpty()) {
-        return ImmutableDoubleArray.EMPTY
-    } else {
-        val subDataRange = (dataRange.first + range.first)..(dataRange.first + range.last)
-        ImmutableDoubleArray(data, subDataRange)
+public fun ImmutableDoubleArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableDoubleArray {
+    // 0 <= startIndex <= endIndex <= size
+    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
+    require(startIndex <= endIndex) {
+        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
     }
+    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
+
+    return ImmutableDoubleArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
 public fun ImmutableDoubleArray.toMutableArray(): DoubleArray {
-    return data.copyOfRange(dataRange.first, dataRange.last + 1)
+    return data.copyOfRange(dataStart, dataEnd)
 }

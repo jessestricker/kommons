@@ -1,23 +1,19 @@
 package kommons
 
-import kommons.internal.buildHashCodeOfRange
-import kommons.internal.checkEqualsInRange
 import kommons.internal.requireIndex
-import kommons.internal.size
 
 /** An immutable array of longs. */
 public class ImmutableLongArray
 internal constructor(
     internal val data: LongArray,
-    internal val dataRange: IntRange = data.indices,
+    internal val dataStart: Int = 0,
+    internal val dataEnd: Int = data.size,
 ) {
-    internal companion object {
-        val EMPTY = ImmutableLongArray(LongArray(0))
-    }
+    // 0 <= dataStart <= dataEnd <= data.size
 
     /** The number of elements. */
     public val size: Int
-        get() = dataRange.size
+        get() = dataEnd - dataStart
 
     /**
      * Returns the element at the given [index].
@@ -26,16 +22,16 @@ internal constructor(
      */
     public operator fun get(index: Int): Long {
         requireIndex(index, size)
-        return data[dataRange.first + index]
+        return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
     public operator fun iterator(): LongIterator {
         return object : LongIterator() {
-            private var dataIndex = dataRange.first
+            private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
-                return dataIndex <= dataRange.last
+                return dataIndex < dataEnd
             }
 
             override fun nextLong(): Long {
@@ -51,17 +47,11 @@ internal constructor(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ImmutableLongArray
-        if (data === other.data && dataRange == other.dataRange) return true
-        return checkEqualsInRange(dataRange, other.dataRange) { index, otherIndex ->
-            data[index] == other.data[otherIndex]
-        }
+        return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
     override fun hashCode(): Int {
-        return buildHashCodeOfRange(dataRange) { index ->
-            val element = data[index]
-            (element xor (element ushr 32)).toInt()
-        }
+        return data.contentHashCode(dataStart, dataEnd)
     }
 
     override fun toString(): String {
@@ -70,14 +60,10 @@ internal constructor(
 }
 
 /**
- * Creates an immutable array of longs of the given [size], with every element initialized to `0L`.
+ * Creates an immutable array of longs of the given [size], with every element initialized to zero.
  */
 public fun ImmutableLongArray(size: Int): ImmutableLongArray {
-    return if (size == 0) {
-        ImmutableLongArray.EMPTY
-    } else {
-        ImmutableLongArray(LongArray(size))
-    }
+    return ImmutableLongArray(LongArray(size))
 }
 
 /**
@@ -85,51 +71,37 @@ public fun ImmutableLongArray(size: Int): ImmutableLongArray {
  * given [init] function.
  */
 public fun ImmutableLongArray(size: Int, init: (index: Int) -> Long): ImmutableLongArray {
-    return if (size == 0) {
-        ImmutableLongArray.EMPTY
-    } else {
-        ImmutableLongArray(LongArray(size, init))
-    }
+    return ImmutableLongArray(LongArray(size, init))
 }
 
 /** Creates a new immutable array of longs which contains the given [elements]. */
 public fun immutableLongArrayOf(vararg elements: Long): ImmutableLongArray {
-    return if (elements.isEmpty()) {
-        ImmutableLongArray.EMPTY
-    } else {
-        ImmutableLongArray(elements)
-    }
+    return ImmutableLongArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
 public fun LongArray.toImmutableArray(): ImmutableLongArray {
-    return if (isEmpty()) {
-        ImmutableLongArray.EMPTY
-    } else {
-        ImmutableLongArray(this.copyOf())
-    }
+    return ImmutableLongArray(this.copyOf())
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from given [startIndex]
+ * (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws[IndexOutOfBoundsException] if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableLongArray.size].
  */
-public fun LongArray.toImmutableArray(range: IntRange): ImmutableLongArray {
-    return if (range.isEmpty()) {
-        ImmutableLongArray.EMPTY
-    } else {
-        ImmutableLongArray(this.copyOfRange(range.first, range.last + 1))
-    }
+public fun LongArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableLongArray {
+    return ImmutableLongArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
 public val ImmutableLongArray.indices: IntRange
-    get() = 0..lastIndex
+    get() = 0..<size
 
 /** The last valid index. */
 public val ImmutableLongArray.lastIndex: Int
-    get() = dataRange.last - dataRange.first
+    get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableLongArray.asList(): List<Long> {
@@ -153,31 +125,33 @@ public operator fun ImmutableLongArray.contains(element: Long): Boolean {
  * does not contain the given value.
  */
 public fun ImmutableLongArray.indexOf(value: Long): Int {
-    for (dataIndex in dataRange) {
+    for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
-            return dataIndex - dataRange.first
+            return dataIndex - dataStart
         }
     }
     return -1
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array in the given [range].
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
- * @throws IndexOutOfBoundsException if one of the endpoints of the given [range] is out of bounds.
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableLongArray.size].
  */
-public fun ImmutableLongArray.subArray(range: IntRange): ImmutableLongArray {
-    requireIndex(range.first, size)
-    requireIndex(range.last, size)
-    return if (range.isEmpty()) {
-        return ImmutableLongArray.EMPTY
-    } else {
-        val subDataRange = (dataRange.first + range.first)..(dataRange.first + range.last)
-        ImmutableLongArray(data, subDataRange)
+public fun ImmutableLongArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableLongArray {
+    // 0 <= startIndex <= endIndex <= size
+    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
+    require(startIndex <= endIndex) {
+        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
     }
+    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
+
+    return ImmutableLongArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
 public fun ImmutableLongArray.toMutableArray(): LongArray {
-    return data.copyOfRange(dataRange.first, dataRange.last + 1)
+    return data.copyOfRange(dataStart, dataEnd)
 }
