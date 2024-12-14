@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of doubles. */
 public class ImmutableDoubleArray
+@PublishedApi
 internal constructor(
     internal val data: DoubleArray,
     internal val dataStart: Int = 0,
@@ -71,8 +72,11 @@ public fun ImmutableDoubleArray(size: Int): ImmutableDoubleArray {
  * Creates an immutable array of doubles of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableDoubleArray(size: Int, init: (index: Int) -> Double): ImmutableDoubleArray {
-    return ImmutableDoubleArray(DoubleArray(size, init))
+public inline fun ImmutableDoubleArray(
+    size: Int,
+    init: (index: Int) -> Double,
+): ImmutableDoubleArray {
+    return ImmutableDoubleArray(DoubleArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of doubles which contains the given [elements]. */

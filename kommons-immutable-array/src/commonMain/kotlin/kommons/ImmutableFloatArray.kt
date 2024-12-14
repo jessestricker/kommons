@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of floats. */
 public class ImmutableFloatArray
+@PublishedApi
 internal constructor(
     internal val data: FloatArray,
     internal val dataStart: Int = 0,
@@ -70,8 +71,8 @@ public fun ImmutableFloatArray(size: Int): ImmutableFloatArray {
  * Creates an immutable array of floats of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableFloatArray(size: Int, init: (index: Int) -> Float): ImmutableFloatArray {
-    return ImmutableFloatArray(FloatArray(size, init))
+public inline fun ImmutableFloatArray(size: Int, init: (index: Int) -> Float): ImmutableFloatArray {
+    return ImmutableFloatArray(FloatArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of floats which contains the given [elements]. */

@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of bytes. */
 public class ImmutableByteArray
+@PublishedApi
 internal constructor(
     internal val data: ByteArray,
     internal val dataStart: Int = 0,
@@ -70,8 +71,8 @@ public fun ImmutableByteArray(size: Int): ImmutableByteArray {
  * Creates an immutable array of bytes of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableByteArray(size: Int, init: (index: Int) -> Byte): ImmutableByteArray {
-    return ImmutableByteArray(ByteArray(size, init))
+public inline fun ImmutableByteArray(size: Int, init: (index: Int) -> Byte): ImmutableByteArray {
+    return ImmutableByteArray(ByteArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of bytes which contains the given [elements]. */

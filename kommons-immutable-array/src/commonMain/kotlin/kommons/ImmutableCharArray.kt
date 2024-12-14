@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of chars. */
 public class ImmutableCharArray
+@PublishedApi
 internal constructor(
     internal val data: CharArray,
     internal val dataStart: Int = 0,
@@ -71,8 +72,8 @@ public fun ImmutableCharArray(size: Int): ImmutableCharArray {
  * Creates an immutable array of chars of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableCharArray(size: Int, init: (index: Int) -> Char): ImmutableCharArray {
-    return ImmutableCharArray(CharArray(size, init))
+public inline fun ImmutableCharArray(size: Int, init: (index: Int) -> Char): ImmutableCharArray {
+    return ImmutableCharArray(CharArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of chars which contains the given [elements]. */

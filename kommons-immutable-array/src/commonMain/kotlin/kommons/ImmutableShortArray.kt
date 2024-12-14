@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of shorts. */
 public class ImmutableShortArray
+@PublishedApi
 internal constructor(
     internal val data: ShortArray,
     internal val dataStart: Int = 0,
@@ -70,8 +71,8 @@ public fun ImmutableShortArray(size: Int): ImmutableShortArray {
  * Creates an immutable array of shorts of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableShortArray(size: Int, init: (index: Int) -> Short): ImmutableShortArray {
-    return ImmutableShortArray(ShortArray(size, init))
+public inline fun ImmutableShortArray(size: Int, init: (index: Int) -> Short): ImmutableShortArray {
+    return ImmutableShortArray(ShortArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of shorts which contains the given [elements]. */

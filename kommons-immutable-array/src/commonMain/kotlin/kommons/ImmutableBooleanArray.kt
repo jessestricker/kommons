@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of booleans. */
 public class ImmutableBooleanArray
+@PublishedApi
 internal constructor(
     internal val data: BooleanArray,
     internal val dataStart: Int = 0,
@@ -71,8 +72,11 @@ public fun ImmutableBooleanArray(size: Int): ImmutableBooleanArray {
  * Creates an immutable array of booleans of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableBooleanArray(size: Int, init: (index: Int) -> Boolean): ImmutableBooleanArray {
-    return ImmutableBooleanArray(BooleanArray(size, init))
+public inline fun ImmutableBooleanArray(
+    size: Int,
+    init: (index: Int) -> Boolean,
+): ImmutableBooleanArray {
+    return ImmutableBooleanArray(BooleanArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of booleans which contains the given [elements]. */

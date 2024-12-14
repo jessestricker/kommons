@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of longs. */
 public class ImmutableLongArray
+@PublishedApi
 internal constructor(
     internal val data: LongArray,
     internal val dataStart: Int = 0,
@@ -70,8 +71,8 @@ public fun ImmutableLongArray(size: Int): ImmutableLongArray {
  * Creates an immutable array of longs of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableLongArray(size: Int, init: (index: Int) -> Long): ImmutableLongArray {
-    return ImmutableLongArray(LongArray(size, init))
+public inline fun ImmutableLongArray(size: Int, init: (index: Int) -> Long): ImmutableLongArray {
+    return ImmutableLongArray(LongArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of longs which contains the given [elements]. */

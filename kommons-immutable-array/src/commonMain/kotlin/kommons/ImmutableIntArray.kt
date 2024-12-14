@@ -4,6 +4,7 @@ import kommons.internal.requireIndex
 
 /** An immutable array of ints. */
 public class ImmutableIntArray
+@PublishedApi
 internal constructor(
     internal val data: IntArray,
     internal val dataStart: Int = 0,
@@ -70,8 +71,8 @@ public fun ImmutableIntArray(size: Int): ImmutableIntArray {
  * Creates an immutable array of ints of the given [size], with every element initialized by the
  * given [init] function.
  */
-public fun ImmutableIntArray(size: Int, init: (index: Int) -> Int): ImmutableIntArray {
-    return ImmutableIntArray(IntArray(size, init))
+public inline fun ImmutableIntArray(size: Int, init: (index: Int) -> Int): ImmutableIntArray {
+    return ImmutableIntArray(IntArray(size) { init(it) })
 }
 
 /** Creates a new immutable array of ints which contains the given [elements]. */
