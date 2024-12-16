@@ -2,7 +2,7 @@
 kotlin = "2.1.0"
 
 detekt = "1.23.7"
-dokka = "2.0.0-Beta"
+dokka = "2.0.0"
 ktfmt = "0.21.0"
 
 [plugins]
