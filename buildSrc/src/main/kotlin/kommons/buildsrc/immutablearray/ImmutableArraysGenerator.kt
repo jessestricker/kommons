@@ -61,7 +61,7 @@ private fun ImmutableArray.classDefinition() =
     public class $immutableArrayType
     @PublishedApi
     internal constructor(
-    internal val data: $arrayType,
+        internal val data: $arrayType,
         internal val dataStart: Int = 0,
         internal val dataEnd: Int = data.size,
     ) {
@@ -103,7 +103,18 @@ private fun ImmutableArray.classDefinition() =
             if (this === other) return true
             if (other == null || this::class != other::class) return false
             other as $immutableArrayType
-            return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
+    
+            if (data === other.data && dataStart == other.dataStart && dataEnd == other.dataEnd) return true
+            if (size != other.size) return false
+    
+            var dataIndex = dataStart
+            var otherDataIndex = other.dataStart
+            while (dataIndex < dataEnd) {
+                if (data[dataIndex++] != other.data[otherDataIndex++]) {
+                    return false
+                }
+            }
+            return true
         }
     
         override fun hashCode(): Int {
