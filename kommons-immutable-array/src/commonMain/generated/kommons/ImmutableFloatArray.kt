@@ -69,7 +69,11 @@ internal constructor(
     }
 
     override fun hashCode(): Int {
-        return data.contentHashCode(dataStart, dataEnd)
+        var result = 1
+        for (dataIndex in dataStart..<dataEnd) {
+            result = 31 * result + data[dataIndex].hashCode()
+        }
+        return result
     }
 
     override fun toString(): String {
