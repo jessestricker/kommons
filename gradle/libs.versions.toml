@@ -3,11 +3,11 @@ kotlin = "2.1.0"
 
 detekt = "1.23.7"
 dokka = "2.0.0"
-ktfmt = "0.21.0"
+spotless = "7.0.0.BETA4"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

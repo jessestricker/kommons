@@ -1,9 +1,12 @@
 plugins {
     `kotlin-dsl`
 
-    alias(libs.plugins.ktfmt)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.spotless)
 }
 
-ktfmt {
-    kotlinLangStyle()
+spotless {
+    kotlin {
+        ktfmt().kotlinlangStyle()
+    }
 }
