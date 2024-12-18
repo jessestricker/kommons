@@ -1,3 +1,4 @@
+import com.diffplug.gradle.spotless.KotlinExtension
 import kommons.buildsrc.immutablearray.GenerateImmutableArraysTask
 
 plugins {
@@ -7,6 +8,11 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.dokka)
     alias(libs.plugins.spotless)
+}
+
+val generateImmutableArrays by tasks.creating(GenerateImmutableArraysTask::class) {
+    outputDirectory.assign(file("src/commonMain/generated"))
+    finalizedBy("spotlessGeneratedApply")
 }
 
 kotlin {
@@ -24,9 +30,6 @@ kotlin {
     sourceSets {
         commonMain {
             kotlin {
-                val generateImmutableArrays by tasks.registering(GenerateImmutableArraysTask::class) {
-                    outputDirectory.assign(file("src/commonMain/generated"))
-                }
                 srcDir(generateImmutableArrays)
             }
         }
@@ -41,6 +44,13 @@ kotlin {
 spotless {
     kotlin {
         target(kotlin.sourceSets.map { it.kotlin })
+        targetExclude(fileTree(generateImmutableArrays.outputDirectory))
+
+        ktfmt().kotlinlangStyle()
+    }
+    format("generated", KotlinExtension::class.java) {
+        target(generateImmutableArrays.outputDirectory)
+
         ktfmt().kotlinlangStyle()
     }
 }
