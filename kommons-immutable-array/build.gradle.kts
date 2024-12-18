@@ -41,6 +41,10 @@ kotlin {
     }
 }
 
+detekt {
+    source.setFrom(kotlin.sourceSets.map { it.kotlin })
+}
+
 spotless {
     kotlin {
         target(kotlin.sourceSets.map { it.kotlin })
