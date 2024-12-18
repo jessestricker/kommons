@@ -1,0 +1,25 @@
+name: Dependencies
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  gradle:
+    name: Gradle
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Java
+        uses: actions/setup-java@v4.5.0
+        with:
+          distribution: temurin
+          java-version: 23
+
+      - name: Generate and submit dependencies
+        uses: gradle/actions/dependency-submission@v4.2.1
