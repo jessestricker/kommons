@@ -5,16 +5,22 @@ import kotlin.reflect.KClass
 
 data class KotlinFileContent(
     val generatedBy: KClass<*>?,
+    val fileAnnotations: List<String>,
     val packageName: String?,
     val imports: List<String>,
     val declarations: List<String>,
 ) {
     class Builder {
+        internal val fileAnnotations = mutableListOf<String>()
         internal val imports = mutableListOf<String>()
         internal val declarations = mutableListOf<String>()
 
         var generatedBy: KClass<*>? = null
         var packageName: String? = null
+
+        fun annotateFile(fileAnnotation: String) {
+            fileAnnotations += fileAnnotation
+        }
 
         fun import(import: String) {
             imports += import
@@ -33,6 +39,7 @@ fun buildKotlinFileContent(action: KotlinFileContentBuildAction): KotlinFileCont
     return with(builder) {
         KotlinFileContent(
             generatedBy = generatedBy,
+            fileAnnotations = fileAnnotations,
             packageName = packageName,
             imports = imports,
             declarations = declarations,
@@ -45,11 +52,11 @@ val KotlinFileContent.generatedByComment: String?
     get() =
         generatedBy?.let {
             """
-        /*
-         * The source code in this file is auto-generated, do not edit manually.
-         * Generator: ${it.qualifiedName}
-         */
-        """
+            /*
+             * The source code in this file is auto-generated, do not edit manually.
+             * Generator: ${it.qualifiedName}
+             */
+            """
                 .trimIndent()
         }
 
@@ -59,6 +66,11 @@ val KotlinFileContent.packageDirectoryName: String?
 fun KotlinFileContent.code(): String = buildString {
     generatedByComment?.let {
         appendLine(it)
+        appendLine()
+    }
+
+    if (fileAnnotations.isNotEmpty()) {
+        appendLine(fileAnnotations.joinToString("\n") { "@file:$it" })
         appendLine()
     }
 

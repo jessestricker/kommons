@@ -15,6 +15,7 @@ object ImmutableArraysGenerator {
             val fileName = immutableArray.immutableArrayType + ".kt"
             val fileContent = buildKotlinFileContent {
                 generatedBy = ImmutableArraysGenerator::class
+                annotateFile("""Suppress("TooManyFunctions")""")
                 packageName = "kommons"
                 import("kommons.internal.requireIndex")
 

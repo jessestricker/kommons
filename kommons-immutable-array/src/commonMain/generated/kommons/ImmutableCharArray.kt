@@ -3,6 +3,8 @@
  * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
  */
 
+@file:Suppress("TooManyFunctions")
+
 package kommons
 
 import kommons.internal.requireIndex
