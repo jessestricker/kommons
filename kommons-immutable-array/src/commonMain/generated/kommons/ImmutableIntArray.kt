@@ -1,12 +1,17 @@
+/*
+ * The source code in this file is auto-generated, do not edit manually.
+ * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ */
+
 package kommons
 
 import kommons.internal.requireIndex
 
-/** An immutable array of floats. */
-public class ImmutableFloatArray
+/** An immutable array of ints. */
+public class ImmutableIntArray
 @PublishedApi
 internal constructor(
-    internal val data: FloatArray,
+    internal val data: IntArray,
     internal val dataStart: Int = 0,
     internal val dataEnd: Int = data.size,
 ) {
@@ -21,21 +26,21 @@ internal constructor(
      *
      * @throws[IndexOutOfBoundsException] if the given [index] is out of bounds.
      */
-    public operator fun get(index: Int): Float {
+    public operator fun get(index: Int): Int {
         requireIndex(index, size)
         return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
-    public operator fun iterator(): FloatIterator {
-        return object : FloatIterator() {
+    public operator fun iterator(): IntIterator {
+        return object : IntIterator() {
             private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
                 return dataIndex < dataEnd
             }
 
-            override fun nextFloat(): Float {
+            override fun nextInt(): Int {
                 if (!hasNext()) {
                     throw NoSuchElementException()
                 }
@@ -47,7 +52,7 @@ internal constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-        other as ImmutableFloatArray
+        other as ImmutableIntArray
         return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
@@ -56,33 +61,33 @@ internal constructor(
     }
 
     override fun toString(): String {
-        return "ImmutableFloatArray(size=$size)"
+        return "ImmutableIntArray(size=$size)"
     }
 }
 
 /**
- * Creates an immutable array of floats of the given [size], with every element initialized to zero.
+ * Creates an immutable array of ints of the given [size], with every element initialized to `0`.
  */
-public fun ImmutableFloatArray(size: Int): ImmutableFloatArray {
-    return ImmutableFloatArray(FloatArray(size))
+public fun ImmutableIntArray(size: Int): ImmutableIntArray {
+    return ImmutableIntArray(IntArray(size))
 }
 
 /**
- * Creates an immutable array of floats of the given [size], with every element initialized by the
+ * Creates an immutable array of ints of the given [size], with every element initialized by the
  * given [init] function.
  */
-public inline fun ImmutableFloatArray(size: Int, init: (index: Int) -> Float): ImmutableFloatArray {
-    return ImmutableFloatArray(FloatArray(size) { init(it) })
+public inline fun ImmutableIntArray(size: Int, init: (index: Int) -> Int): ImmutableIntArray {
+    return ImmutableIntArray(IntArray(size) { init(it) })
 }
 
-/** Creates a new immutable array of floats which contains the given [elements]. */
-public fun immutableFloatArrayOf(vararg elements: Float): ImmutableFloatArray {
-    return ImmutableFloatArray(elements)
+/** Creates a new immutable array of ints which contains the given [elements]. */
+public fun immutableIntArrayOf(vararg elements: Int): ImmutableIntArray {
+    return ImmutableIntArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
-public fun FloatArray.toImmutableArray(): ImmutableFloatArray {
-    return ImmutableFloatArray(this.copyOf())
+public fun IntArray.toImmutableArray(): ImmutableIntArray {
+    return ImmutableIntArray(this.copyOf())
 }
 
 /**
@@ -90,24 +95,24 @@ public fun FloatArray.toImmutableArray(): ImmutableFloatArray {
  * (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableFloatArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableIntArray.size].
  */
-public fun FloatArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableFloatArray {
-    return ImmutableFloatArray(this.copyOfRange(startIndex, endIndex))
+public fun IntArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableIntArray {
+    return ImmutableIntArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
-public val ImmutableFloatArray.indices: IntRange
+public val ImmutableIntArray.indices: IntRange
     get() = 0..<size
 
 /** The last valid index. */
-public val ImmutableFloatArray.lastIndex: Int
+public val ImmutableIntArray.lastIndex: Int
     get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
-public fun ImmutableFloatArray.asList(): List<Float> {
-    return object : AbstractList<Float>() {
-        override fun get(index: Int): Float {
+public fun ImmutableIntArray.asList(): List<Int> {
+    return object : AbstractList<Int>() {
+        override fun get(index: Int): Int {
             return this@asList[index]
         }
 
@@ -117,7 +122,7 @@ public fun ImmutableFloatArray.asList(): List<Float> {
 }
 
 /** Returns whether this array contains the given [element]. */
-public operator fun ImmutableFloatArray.contains(element: Float): Boolean {
+public operator fun ImmutableIntArray.contains(element: Int): Boolean {
     return indexOf(element) != -1
 }
 
@@ -125,7 +130,7 @@ public operator fun ImmutableFloatArray.contains(element: Float): Boolean {
  * Returns the index of the first occurrence of the given [value] in this array, or -1 if this array
  * does not contain the given value.
  */
-public fun ImmutableFloatArray.indexOf(value: Float): Int {
+public fun ImmutableIntArray.indexOf(value: Int): Int {
     for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
@@ -139,9 +144,9 @@ public fun ImmutableFloatArray.indexOf(value: Float): Int {
  * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableFloatArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableIntArray.size].
  */
-public fun ImmutableFloatArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableFloatArray {
+public fun ImmutableIntArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableIntArray {
     // 0 <= startIndex <= endIndex <= size
     require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
     require(startIndex <= endIndex) {
@@ -149,10 +154,10 @@ public fun ImmutableFloatArray.sliceArray(startIndex: Int, endIndex: Int): Immut
     }
     require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
 
-    return ImmutableFloatArray(data, dataStart + startIndex, dataStart + endIndex)
+    return ImmutableIntArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
-public fun ImmutableFloatArray.toMutableArray(): FloatArray {
+public fun ImmutableIntArray.toMutableArray(): IntArray {
     return data.copyOfRange(dataStart, dataEnd)
 }

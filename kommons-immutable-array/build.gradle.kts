@@ -1,3 +1,5 @@
+import kommons.buildsrc.immutablearray.GenerateImmutableArraysTask
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     id("maven-publish")
@@ -20,6 +22,14 @@ kotlin {
     }
 
     sourceSets {
+        commonMain {
+            kotlin {
+                val generateImmutableArrays by tasks.registering(GenerateImmutableArraysTask::class) {
+                    outputDirectory.assign(file("src/commonMain/generated"))
+                }
+                srcDir(generateImmutableArrays)
+            }
+        }
         commonTest {
             dependencies {
                 implementation(kotlin("test"))

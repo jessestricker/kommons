@@ -1,12 +1,17 @@
+/*
+ * The source code in this file is auto-generated, do not edit manually.
+ * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ */
+
 package kommons
 
 import kommons.internal.requireIndex
 
-/** An immutable array of booleans. */
-public class ImmutableBooleanArray
+/** An immutable array of longs. */
+public class ImmutableLongArray
 @PublishedApi
 internal constructor(
-    internal val data: BooleanArray,
+    internal val data: LongArray,
     internal val dataStart: Int = 0,
     internal val dataEnd: Int = data.size,
 ) {
@@ -21,21 +26,21 @@ internal constructor(
      *
      * @throws[IndexOutOfBoundsException] if the given [index] is out of bounds.
      */
-    public operator fun get(index: Int): Boolean {
+    public operator fun get(index: Int): Long {
         requireIndex(index, size)
         return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
-    public operator fun iterator(): BooleanIterator {
-        return object : BooleanIterator() {
+    public operator fun iterator(): LongIterator {
+        return object : LongIterator() {
             private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
                 return dataIndex < dataEnd
             }
 
-            override fun nextBoolean(): Boolean {
+            override fun nextLong(): Long {
                 if (!hasNext()) {
                     throw NoSuchElementException()
                 }
@@ -47,7 +52,7 @@ internal constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-        other as ImmutableBooleanArray
+        other as ImmutableLongArray
         return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
@@ -56,37 +61,33 @@ internal constructor(
     }
 
     override fun toString(): String {
-        return "ImmutableBooleanArray(size=$size)"
+        return "ImmutableLongArray(size=$size)"
     }
 }
 
 /**
- * Creates an immutable array of booleans of the given [size], with every element initialized to
- * `false`.
+ * Creates an immutable array of longs of the given [size], with every element initialized to `0L`.
  */
-public fun ImmutableBooleanArray(size: Int): ImmutableBooleanArray {
-    return ImmutableBooleanArray(BooleanArray(size))
+public fun ImmutableLongArray(size: Int): ImmutableLongArray {
+    return ImmutableLongArray(LongArray(size))
 }
 
 /**
- * Creates an immutable array of booleans of the given [size], with every element initialized by the
+ * Creates an immutable array of longs of the given [size], with every element initialized by the
  * given [init] function.
  */
-public inline fun ImmutableBooleanArray(
-    size: Int,
-    init: (index: Int) -> Boolean,
-): ImmutableBooleanArray {
-    return ImmutableBooleanArray(BooleanArray(size) { init(it) })
+public inline fun ImmutableLongArray(size: Int, init: (index: Int) -> Long): ImmutableLongArray {
+    return ImmutableLongArray(LongArray(size) { init(it) })
 }
 
-/** Creates a new immutable array of booleans which contains the given [elements]. */
-public fun immutableBooleanArrayOf(vararg elements: Boolean): ImmutableBooleanArray {
-    return ImmutableBooleanArray(elements)
+/** Creates a new immutable array of longs which contains the given [elements]. */
+public fun immutableLongArrayOf(vararg elements: Long): ImmutableLongArray {
+    return ImmutableLongArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
-public fun BooleanArray.toImmutableArray(): ImmutableBooleanArray {
-    return ImmutableBooleanArray(this.copyOf())
+public fun LongArray.toImmutableArray(): ImmutableLongArray {
+    return ImmutableLongArray(this.copyOf())
 }
 
 /**
@@ -94,24 +95,24 @@ public fun BooleanArray.toImmutableArray(): ImmutableBooleanArray {
  * (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableBooleanArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableLongArray.size].
  */
-public fun BooleanArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableBooleanArray {
-    return ImmutableBooleanArray(this.copyOfRange(startIndex, endIndex))
+public fun LongArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableLongArray {
+    return ImmutableLongArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
-public val ImmutableBooleanArray.indices: IntRange
+public val ImmutableLongArray.indices: IntRange
     get() = 0..<size
 
 /** The last valid index. */
-public val ImmutableBooleanArray.lastIndex: Int
+public val ImmutableLongArray.lastIndex: Int
     get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
-public fun ImmutableBooleanArray.asList(): List<Boolean> {
-    return object : AbstractList<Boolean>() {
-        override fun get(index: Int): Boolean {
+public fun ImmutableLongArray.asList(): List<Long> {
+    return object : AbstractList<Long>() {
+        override fun get(index: Int): Long {
             return this@asList[index]
         }
 
@@ -121,7 +122,7 @@ public fun ImmutableBooleanArray.asList(): List<Boolean> {
 }
 
 /** Returns whether this array contains the given [element]. */
-public operator fun ImmutableBooleanArray.contains(element: Boolean): Boolean {
+public operator fun ImmutableLongArray.contains(element: Long): Boolean {
     return indexOf(element) != -1
 }
 
@@ -129,7 +130,7 @@ public operator fun ImmutableBooleanArray.contains(element: Boolean): Boolean {
  * Returns the index of the first occurrence of the given [value] in this array, or -1 if this array
  * does not contain the given value.
  */
-public fun ImmutableBooleanArray.indexOf(value: Boolean): Int {
+public fun ImmutableLongArray.indexOf(value: Long): Int {
     for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
@@ -143,9 +144,9 @@ public fun ImmutableBooleanArray.indexOf(value: Boolean): Int {
  * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableBooleanArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableLongArray.size].
  */
-public fun ImmutableBooleanArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableBooleanArray {
+public fun ImmutableLongArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableLongArray {
     // 0 <= startIndex <= endIndex <= size
     require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
     require(startIndex <= endIndex) {
@@ -153,10 +154,10 @@ public fun ImmutableBooleanArray.sliceArray(startIndex: Int, endIndex: Int): Imm
     }
     require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
 
-    return ImmutableBooleanArray(data, dataStart + startIndex, dataStart + endIndex)
+    return ImmutableLongArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
-public fun ImmutableBooleanArray.toMutableArray(): BooleanArray {
+public fun ImmutableLongArray.toMutableArray(): LongArray {
     return data.copyOfRange(dataStart, dataEnd)
 }

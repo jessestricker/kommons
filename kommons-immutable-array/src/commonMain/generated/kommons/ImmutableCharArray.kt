@@ -1,12 +1,17 @@
+/*
+ * The source code in this file is auto-generated, do not edit manually.
+ * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ */
+
 package kommons
 
 import kommons.internal.requireIndex
 
-/** An immutable array of longs. */
-public class ImmutableLongArray
+/** An immutable array of chars. */
+public class ImmutableCharArray
 @PublishedApi
 internal constructor(
-    internal val data: LongArray,
+    internal val data: CharArray,
     internal val dataStart: Int = 0,
     internal val dataEnd: Int = data.size,
 ) {
@@ -21,21 +26,21 @@ internal constructor(
      *
      * @throws[IndexOutOfBoundsException] if the given [index] is out of bounds.
      */
-    public operator fun get(index: Int): Long {
+    public operator fun get(index: Int): Char {
         requireIndex(index, size)
         return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
-    public operator fun iterator(): LongIterator {
-        return object : LongIterator() {
+    public operator fun iterator(): CharIterator {
+        return object : CharIterator() {
             private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
                 return dataIndex < dataEnd
             }
 
-            override fun nextLong(): Long {
+            override fun nextChar(): Char {
                 if (!hasNext()) {
                     throw NoSuchElementException()
                 }
@@ -47,7 +52,7 @@ internal constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-        other as ImmutableLongArray
+        other as ImmutableCharArray
         return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
@@ -56,33 +61,34 @@ internal constructor(
     }
 
     override fun toString(): String {
-        return "ImmutableLongArray(size=$size)"
+        return "ImmutableCharArray(size=$size)"
     }
 }
 
 /**
- * Creates an immutable array of longs of the given [size], with every element initialized to zero.
+ * Creates an immutable array of chars of the given [size], with every element initialized to
+ * `'\u0000'`.
  */
-public fun ImmutableLongArray(size: Int): ImmutableLongArray {
-    return ImmutableLongArray(LongArray(size))
+public fun ImmutableCharArray(size: Int): ImmutableCharArray {
+    return ImmutableCharArray(CharArray(size))
 }
 
 /**
- * Creates an immutable array of longs of the given [size], with every element initialized by the
+ * Creates an immutable array of chars of the given [size], with every element initialized by the
  * given [init] function.
  */
-public inline fun ImmutableLongArray(size: Int, init: (index: Int) -> Long): ImmutableLongArray {
-    return ImmutableLongArray(LongArray(size) { init(it) })
+public inline fun ImmutableCharArray(size: Int, init: (index: Int) -> Char): ImmutableCharArray {
+    return ImmutableCharArray(CharArray(size) { init(it) })
 }
 
-/** Creates a new immutable array of longs which contains the given [elements]. */
-public fun immutableLongArrayOf(vararg elements: Long): ImmutableLongArray {
-    return ImmutableLongArray(elements)
+/** Creates a new immutable array of chars which contains the given [elements]. */
+public fun immutableCharArrayOf(vararg elements: Char): ImmutableCharArray {
+    return ImmutableCharArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
-public fun LongArray.toImmutableArray(): ImmutableLongArray {
-    return ImmutableLongArray(this.copyOf())
+public fun CharArray.toImmutableArray(): ImmutableCharArray {
+    return ImmutableCharArray(this.copyOf())
 }
 
 /**
@@ -90,24 +96,24 @@ public fun LongArray.toImmutableArray(): ImmutableLongArray {
  * (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableLongArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableCharArray.size].
  */
-public fun LongArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableLongArray {
-    return ImmutableLongArray(this.copyOfRange(startIndex, endIndex))
+public fun CharArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableCharArray {
+    return ImmutableCharArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
-public val ImmutableLongArray.indices: IntRange
+public val ImmutableCharArray.indices: IntRange
     get() = 0..<size
 
 /** The last valid index. */
-public val ImmutableLongArray.lastIndex: Int
+public val ImmutableCharArray.lastIndex: Int
     get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
-public fun ImmutableLongArray.asList(): List<Long> {
-    return object : AbstractList<Long>() {
-        override fun get(index: Int): Long {
+public fun ImmutableCharArray.asList(): List<Char> {
+    return object : AbstractList<Char>() {
+        override fun get(index: Int): Char {
             return this@asList[index]
         }
 
@@ -117,7 +123,7 @@ public fun ImmutableLongArray.asList(): List<Long> {
 }
 
 /** Returns whether this array contains the given [element]. */
-public operator fun ImmutableLongArray.contains(element: Long): Boolean {
+public operator fun ImmutableCharArray.contains(element: Char): Boolean {
     return indexOf(element) != -1
 }
 
@@ -125,7 +131,7 @@ public operator fun ImmutableLongArray.contains(element: Long): Boolean {
  * Returns the index of the first occurrence of the given [value] in this array, or -1 if this array
  * does not contain the given value.
  */
-public fun ImmutableLongArray.indexOf(value: Long): Int {
+public fun ImmutableCharArray.indexOf(value: Char): Int {
     for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
@@ -139,9 +145,9 @@ public fun ImmutableLongArray.indexOf(value: Long): Int {
  * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableLongArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableCharArray.size].
  */
-public fun ImmutableLongArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableLongArray {
+public fun ImmutableCharArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableCharArray {
     // 0 <= startIndex <= endIndex <= size
     require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
     require(startIndex <= endIndex) {
@@ -149,10 +155,10 @@ public fun ImmutableLongArray.sliceArray(startIndex: Int, endIndex: Int): Immuta
     }
     require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
 
-    return ImmutableLongArray(data, dataStart + startIndex, dataStart + endIndex)
+    return ImmutableCharArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
-public fun ImmutableLongArray.toMutableArray(): LongArray {
+public fun ImmutableCharArray.toMutableArray(): CharArray {
     return data.copyOfRange(dataStart, dataEnd)
 }

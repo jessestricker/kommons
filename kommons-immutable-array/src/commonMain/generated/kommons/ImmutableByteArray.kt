@@ -1,12 +1,17 @@
+/*
+ * The source code in this file is auto-generated, do not edit manually.
+ * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ */
+
 package kommons
 
 import kommons.internal.requireIndex
 
-/** An immutable array of shorts. */
-public class ImmutableShortArray
+/** An immutable array of bytes. */
+public class ImmutableByteArray
 @PublishedApi
 internal constructor(
-    internal val data: ShortArray,
+    internal val data: ByteArray,
     internal val dataStart: Int = 0,
     internal val dataEnd: Int = data.size,
 ) {
@@ -21,21 +26,21 @@ internal constructor(
      *
      * @throws[IndexOutOfBoundsException] if the given [index] is out of bounds.
      */
-    public operator fun get(index: Int): Short {
+    public operator fun get(index: Int): Byte {
         requireIndex(index, size)
         return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
-    public operator fun iterator(): ShortIterator {
-        return object : ShortIterator() {
+    public operator fun iterator(): ByteIterator {
+        return object : ByteIterator() {
             private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
                 return dataIndex < dataEnd
             }
 
-            override fun nextShort(): Short {
+            override fun nextByte(): Byte {
                 if (!hasNext()) {
                     throw NoSuchElementException()
                 }
@@ -47,7 +52,7 @@ internal constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-        other as ImmutableShortArray
+        other as ImmutableByteArray
         return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
@@ -56,33 +61,33 @@ internal constructor(
     }
 
     override fun toString(): String {
-        return "ImmutableShortArray(size=$size)"
+        return "ImmutableByteArray(size=$size)"
     }
 }
 
 /**
- * Creates an immutable array of shorts of the given [size], with every element initialized to zero.
+ * Creates an immutable array of bytes of the given [size], with every element initialized to `0`.
  */
-public fun ImmutableShortArray(size: Int): ImmutableShortArray {
-    return ImmutableShortArray(ShortArray(size))
+public fun ImmutableByteArray(size: Int): ImmutableByteArray {
+    return ImmutableByteArray(ByteArray(size))
 }
 
 /**
- * Creates an immutable array of shorts of the given [size], with every element initialized by the
+ * Creates an immutable array of bytes of the given [size], with every element initialized by the
  * given [init] function.
  */
-public inline fun ImmutableShortArray(size: Int, init: (index: Int) -> Short): ImmutableShortArray {
-    return ImmutableShortArray(ShortArray(size) { init(it) })
+public inline fun ImmutableByteArray(size: Int, init: (index: Int) -> Byte): ImmutableByteArray {
+    return ImmutableByteArray(ByteArray(size) { init(it) })
 }
 
-/** Creates a new immutable array of shorts which contains the given [elements]. */
-public fun immutableShortArrayOf(vararg elements: Short): ImmutableShortArray {
-    return ImmutableShortArray(elements)
+/** Creates a new immutable array of bytes which contains the given [elements]. */
+public fun immutableByteArrayOf(vararg elements: Byte): ImmutableByteArray {
+    return ImmutableByteArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
-public fun ShortArray.toImmutableArray(): ImmutableShortArray {
-    return ImmutableShortArray(this.copyOf())
+public fun ByteArray.toImmutableArray(): ImmutableByteArray {
+    return ImmutableByteArray(this.copyOf())
 }
 
 /**
@@ -90,24 +95,24 @@ public fun ShortArray.toImmutableArray(): ImmutableShortArray {
  * (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableShortArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableByteArray.size].
  */
-public fun ShortArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableShortArray {
-    return ImmutableShortArray(this.copyOfRange(startIndex, endIndex))
+public fun ByteArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableByteArray {
+    return ImmutableByteArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
-public val ImmutableShortArray.indices: IntRange
+public val ImmutableByteArray.indices: IntRange
     get() = 0..<size
 
 /** The last valid index. */
-public val ImmutableShortArray.lastIndex: Int
+public val ImmutableByteArray.lastIndex: Int
     get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
-public fun ImmutableShortArray.asList(): List<Short> {
-    return object : AbstractList<Short>() {
-        override fun get(index: Int): Short {
+public fun ImmutableByteArray.asList(): List<Byte> {
+    return object : AbstractList<Byte>() {
+        override fun get(index: Int): Byte {
             return this@asList[index]
         }
 
@@ -117,7 +122,7 @@ public fun ImmutableShortArray.asList(): List<Short> {
 }
 
 /** Returns whether this array contains the given [element]. */
-public operator fun ImmutableShortArray.contains(element: Short): Boolean {
+public operator fun ImmutableByteArray.contains(element: Byte): Boolean {
     return indexOf(element) != -1
 }
 
@@ -125,7 +130,7 @@ public operator fun ImmutableShortArray.contains(element: Short): Boolean {
  * Returns the index of the first occurrence of the given [value] in this array, or -1 if this array
  * does not contain the given value.
  */
-public fun ImmutableShortArray.indexOf(value: Short): Int {
+public fun ImmutableByteArray.indexOf(value: Byte): Int {
     for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
@@ -139,9 +144,9 @@ public fun ImmutableShortArray.indexOf(value: Short): Int {
  * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableShortArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableByteArray.size].
  */
-public fun ImmutableShortArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableShortArray {
+public fun ImmutableByteArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableByteArray {
     // 0 <= startIndex <= endIndex <= size
     require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
     require(startIndex <= endIndex) {
@@ -149,10 +154,10 @@ public fun ImmutableShortArray.sliceArray(startIndex: Int, endIndex: Int): Immut
     }
     require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
 
-    return ImmutableShortArray(data, dataStart + startIndex, dataStart + endIndex)
+    return ImmutableByteArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
-public fun ImmutableShortArray.toMutableArray(): ShortArray {
+public fun ImmutableByteArray.toMutableArray(): ByteArray {
     return data.copyOfRange(dataStart, dataEnd)
 }

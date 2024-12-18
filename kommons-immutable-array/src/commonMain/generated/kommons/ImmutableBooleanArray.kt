@@ -1,12 +1,17 @@
+/*
+ * The source code in this file is auto-generated, do not edit manually.
+ * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ */
+
 package kommons
 
 import kommons.internal.requireIndex
 
-/** An immutable array of doubles. */
-public class ImmutableDoubleArray
+/** An immutable array of booleans. */
+public class ImmutableBooleanArray
 @PublishedApi
 internal constructor(
-    internal val data: DoubleArray,
+    internal val data: BooleanArray,
     internal val dataStart: Int = 0,
     internal val dataEnd: Int = data.size,
 ) {
@@ -21,21 +26,21 @@ internal constructor(
      *
      * @throws[IndexOutOfBoundsException] if the given [index] is out of bounds.
      */
-    public operator fun get(index: Int): Double {
+    public operator fun get(index: Int): Boolean {
         requireIndex(index, size)
         return data[dataStart + index]
     }
 
     /** Returns an iterator over the elements. */
-    public operator fun iterator(): DoubleIterator {
-        return object : DoubleIterator() {
+    public operator fun iterator(): BooleanIterator {
+        return object : BooleanIterator() {
             private var dataIndex = dataStart
 
             override fun hasNext(): Boolean {
                 return dataIndex < dataEnd
             }
 
-            override fun nextDouble(): Double {
+            override fun nextBoolean(): Boolean {
                 if (!hasNext()) {
                     throw NoSuchElementException()
                 }
@@ -47,7 +52,7 @@ internal constructor(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-        other as ImmutableDoubleArray
+        other as ImmutableBooleanArray
         return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
@@ -56,37 +61,37 @@ internal constructor(
     }
 
     override fun toString(): String {
-        return "ImmutableDoubleArray(size=$size)"
+        return "ImmutableBooleanArray(size=$size)"
     }
 }
 
 /**
- * Creates an immutable array of doubles of the given [size], with every element initialized to
- * zero.
+ * Creates an immutable array of booleans of the given [size], with every element initialized to
+ * `false`.
  */
-public fun ImmutableDoubleArray(size: Int): ImmutableDoubleArray {
-    return ImmutableDoubleArray(DoubleArray(size))
+public fun ImmutableBooleanArray(size: Int): ImmutableBooleanArray {
+    return ImmutableBooleanArray(BooleanArray(size))
 }
 
 /**
- * Creates an immutable array of doubles of the given [size], with every element initialized by the
+ * Creates an immutable array of booleans of the given [size], with every element initialized by the
  * given [init] function.
  */
-public inline fun ImmutableDoubleArray(
+public inline fun ImmutableBooleanArray(
     size: Int,
-    init: (index: Int) -> Double,
-): ImmutableDoubleArray {
-    return ImmutableDoubleArray(DoubleArray(size) { init(it) })
+    init: (index: Int) -> Boolean,
+): ImmutableBooleanArray {
+    return ImmutableBooleanArray(BooleanArray(size) { init(it) })
 }
 
-/** Creates a new immutable array of doubles which contains the given [elements]. */
-public fun immutableDoubleArrayOf(vararg elements: Double): ImmutableDoubleArray {
-    return ImmutableDoubleArray(elements)
+/** Creates a new immutable array of booleans which contains the given [elements]. */
+public fun immutableBooleanArrayOf(vararg elements: Boolean): ImmutableBooleanArray {
+    return ImmutableBooleanArray(elements)
 }
 
 /** Returns a new immutable array which contains the elements of this array. */
-public fun DoubleArray.toImmutableArray(): ImmutableDoubleArray {
-    return ImmutableDoubleArray(this.copyOf())
+public fun BooleanArray.toImmutableArray(): ImmutableBooleanArray {
+    return ImmutableBooleanArray(this.copyOf())
 }
 
 /**
@@ -94,24 +99,24 @@ public fun DoubleArray.toImmutableArray(): ImmutableDoubleArray {
  * (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableDoubleArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableBooleanArray.size].
  */
-public fun DoubleArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableDoubleArray {
-    return ImmutableDoubleArray(this.copyOfRange(startIndex, endIndex))
+public fun BooleanArray.toImmutableArray(startIndex: Int, endIndex: Int): ImmutableBooleanArray {
+    return ImmutableBooleanArray(this.copyOfRange(startIndex, endIndex))
 }
 
 /** The range of valid indices. */
-public val ImmutableDoubleArray.indices: IntRange
+public val ImmutableBooleanArray.indices: IntRange
     get() = 0..<size
 
 /** The last valid index. */
-public val ImmutableDoubleArray.lastIndex: Int
+public val ImmutableBooleanArray.lastIndex: Int
     get() = size - 1
 
 /** Returns an immutable [List] which contains the elements of this array. */
-public fun ImmutableDoubleArray.asList(): List<Double> {
-    return object : AbstractList<Double>() {
-        override fun get(index: Int): Double {
+public fun ImmutableBooleanArray.asList(): List<Boolean> {
+    return object : AbstractList<Boolean>() {
+        override fun get(index: Int): Boolean {
             return this@asList[index]
         }
 
@@ -121,7 +126,7 @@ public fun ImmutableDoubleArray.asList(): List<Double> {
 }
 
 /** Returns whether this array contains the given [element]. */
-public operator fun ImmutableDoubleArray.contains(element: Double): Boolean {
+public operator fun ImmutableBooleanArray.contains(element: Boolean): Boolean {
     return indexOf(element) != -1
 }
 
@@ -129,7 +134,7 @@ public operator fun ImmutableDoubleArray.contains(element: Double): Boolean {
  * Returns the index of the first occurrence of the given [value] in this array, or -1 if this array
  * does not contain the given value.
  */
-public fun ImmutableDoubleArray.indexOf(value: Double): Int {
+public fun ImmutableBooleanArray.indexOf(value: Boolean): Int {
     for (dataIndex in dataStart..<dataEnd) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
@@ -143,9 +148,9 @@ public fun ImmutableDoubleArray.indexOf(value: Double): Int {
  * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableDoubleArray.size].
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableBooleanArray.size].
  */
-public fun ImmutableDoubleArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableDoubleArray {
+public fun ImmutableBooleanArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableBooleanArray {
     // 0 <= startIndex <= endIndex <= size
     require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
     require(startIndex <= endIndex) {
@@ -153,10 +158,10 @@ public fun ImmutableDoubleArray.sliceArray(startIndex: Int, endIndex: Int): Immu
     }
     require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
 
-    return ImmutableDoubleArray(data, dataStart + startIndex, dataStart + endIndex)
+    return ImmutableBooleanArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** Returns a new mutable array which contains the elements of this array. */
-public fun ImmutableDoubleArray.toMutableArray(): DoubleArray {
+public fun ImmutableBooleanArray.toMutableArray(): BooleanArray {
     return data.copyOfRange(dataStart, dataEnd)
 }
