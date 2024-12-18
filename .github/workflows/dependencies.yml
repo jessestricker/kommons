@@ -22,4 +22,4 @@ jobs:
           java-version: 23
 
       - name: Generate and submit dependencies
-        uses: gradle/actions/dependency-submission@v4.2.1
+        uses: gradle/actions/dependency-submission@v4.2.2
