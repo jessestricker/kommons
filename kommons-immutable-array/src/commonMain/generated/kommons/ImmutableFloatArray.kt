@@ -102,23 +102,41 @@ public fun FloatArray.toImmutableArray(startIndex: Int, endIndex: Int): Immutabl
     return ImmutableFloatArray(this.copyOfRange(startIndex, endIndex))
 }
 
-/** The range of valid indices. */
-public val ImmutableFloatArray.indices: IntRange
-    get() = 0..<size
+/** Returns whether this array is empty. */
+public fun ImmutableFloatArray.isEmpty(): Boolean {
+    return size == 0
+}
+
+/** Returns whether this array is not empty. */
+public fun ImmutableFloatArray.isNotEmpty(): Boolean {
+    return !isEmpty()
+}
 
 /** The last valid index. */
 public val ImmutableFloatArray.lastIndex: Int
     get() = size - 1
 
+/** The range of valid indices. */
+public val ImmutableFloatArray.indices: IntRange
+    get() = IntRange(0, lastIndex)
+
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableFloatArray.asList(): List<Float> {
-    return object : AbstractList<Float>() {
-        override fun get(index: Int): Float {
-            return this@asList[index]
-        }
-
+    return object : AbstractList<Float>(), RandomAccess {
         override val size: Int
             get() = this@asList.size
+
+        override fun contains(element: Float): Boolean = this@asList.contains(element)
+
+        override fun get(index: Int): Float = this@asList[index]
+
+        override fun indexOf(element: Float): Int = this@asList.indexOf(element)
+
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+
+        override fun iterator(): Iterator<Float> = this@asList.iterator()
+
+        override fun lastIndexOf(element: Float): Int = this@asList.lastIndexOf(element)
     }
 }
 
@@ -133,6 +151,19 @@ public operator fun ImmutableFloatArray.contains(element: Float): Boolean {
  */
 public fun ImmutableFloatArray.indexOf(value: Float): Int {
     for (dataIndex in dataStart..<dataEnd) {
+        if (value == data[dataIndex]) {
+            return dataIndex - dataStart
+        }
+    }
+    return -1
+}
+
+/**
+ * Returns the index of the last occurrence of the given [value] in this array, or -1 if this array
+ * does not contain the given value.
+ */
+public fun ImmutableFloatArray.lastIndexOf(value: Float): Int {
+    for (dataIndex in (dataStart..<dataEnd).reversed()) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
         }

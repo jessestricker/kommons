@@ -101,23 +101,41 @@ public fun ShortArray.toImmutableArray(startIndex: Int, endIndex: Int): Immutabl
     return ImmutableShortArray(this.copyOfRange(startIndex, endIndex))
 }
 
-/** The range of valid indices. */
-public val ImmutableShortArray.indices: IntRange
-    get() = 0..<size
+/** Returns whether this array is empty. */
+public fun ImmutableShortArray.isEmpty(): Boolean {
+    return size == 0
+}
+
+/** Returns whether this array is not empty. */
+public fun ImmutableShortArray.isNotEmpty(): Boolean {
+    return !isEmpty()
+}
 
 /** The last valid index. */
 public val ImmutableShortArray.lastIndex: Int
     get() = size - 1
 
+/** The range of valid indices. */
+public val ImmutableShortArray.indices: IntRange
+    get() = IntRange(0, lastIndex)
+
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableShortArray.asList(): List<Short> {
-    return object : AbstractList<Short>() {
-        override fun get(index: Int): Short {
-            return this@asList[index]
-        }
-
+    return object : AbstractList<Short>(), RandomAccess {
         override val size: Int
             get() = this@asList.size
+
+        override fun contains(element: Short): Boolean = this@asList.contains(element)
+
+        override fun get(index: Int): Short = this@asList[index]
+
+        override fun indexOf(element: Short): Int = this@asList.indexOf(element)
+
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+
+        override fun iterator(): Iterator<Short> = this@asList.iterator()
+
+        override fun lastIndexOf(element: Short): Int = this@asList.lastIndexOf(element)
     }
 }
 
@@ -132,6 +150,19 @@ public operator fun ImmutableShortArray.contains(element: Short): Boolean {
  */
 public fun ImmutableShortArray.indexOf(value: Short): Int {
     for (dataIndex in dataStart..<dataEnd) {
+        if (value == data[dataIndex]) {
+            return dataIndex - dataStart
+        }
+    }
+    return -1
+}
+
+/**
+ * Returns the index of the last occurrence of the given [value] in this array, or -1 if this array
+ * does not contain the given value.
+ */
+public fun ImmutableShortArray.lastIndexOf(value: Short): Int {
+    for (dataIndex in (dataStart..<dataEnd).reversed()) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
         }

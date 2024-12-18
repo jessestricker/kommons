@@ -102,23 +102,41 @@ public fun CharArray.toImmutableArray(startIndex: Int, endIndex: Int): Immutable
     return ImmutableCharArray(this.copyOfRange(startIndex, endIndex))
 }
 
-/** The range of valid indices. */
-public val ImmutableCharArray.indices: IntRange
-    get() = 0..<size
+/** Returns whether this array is empty. */
+public fun ImmutableCharArray.isEmpty(): Boolean {
+    return size == 0
+}
+
+/** Returns whether this array is not empty. */
+public fun ImmutableCharArray.isNotEmpty(): Boolean {
+    return !isEmpty()
+}
 
 /** The last valid index. */
 public val ImmutableCharArray.lastIndex: Int
     get() = size - 1
 
+/** The range of valid indices. */
+public val ImmutableCharArray.indices: IntRange
+    get() = IntRange(0, lastIndex)
+
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableCharArray.asList(): List<Char> {
-    return object : AbstractList<Char>() {
-        override fun get(index: Int): Char {
-            return this@asList[index]
-        }
-
+    return object : AbstractList<Char>(), RandomAccess {
         override val size: Int
             get() = this@asList.size
+
+        override fun contains(element: Char): Boolean = this@asList.contains(element)
+
+        override fun get(index: Int): Char = this@asList[index]
+
+        override fun indexOf(element: Char): Int = this@asList.indexOf(element)
+
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+
+        override fun iterator(): Iterator<Char> = this@asList.iterator()
+
+        override fun lastIndexOf(element: Char): Int = this@asList.lastIndexOf(element)
     }
 }
 
@@ -133,6 +151,19 @@ public operator fun ImmutableCharArray.contains(element: Char): Boolean {
  */
 public fun ImmutableCharArray.indexOf(value: Char): Int {
     for (dataIndex in dataStart..<dataEnd) {
+        if (value == data[dataIndex]) {
+            return dataIndex - dataStart
+        }
+    }
+    return -1
+}
+
+/**
+ * Returns the index of the last occurrence of the given [value] in this array, or -1 if this array
+ * does not contain the given value.
+ */
+public fun ImmutableCharArray.lastIndexOf(value: Char): Int {
+    for (dataIndex in (dataStart..<dataEnd).reversed()) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
         }

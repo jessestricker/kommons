@@ -23,12 +23,15 @@ object ImmutableArraysGenerator {
                 declare(immutableArray.immutableArrayOf())
                 declare(immutableArray.toImmutableArray())
 
-                declare(immutableArray.indices())
+                declare(immutableArray.isEmpty())
+                declare(immutableArray.isNotEmpty())
                 declare(immutableArray.lastIndex())
+                declare(immutableArray.indices())
 
                 declare(immutableArray.asList())
                 declare(immutableArray.contains())
                 declare(immutableArray.indexOf())
+                declare(immutableArray.lastIndexOf())
                 declare(immutableArray.sliceArray())
                 declare(immutableArray.toMutableArray())
             }
@@ -167,11 +170,22 @@ private fun ImmutableArray.toImmutableArray() =
         .trimIndent()
 
 // language=kotlin
-private fun ImmutableArray.indices() =
+private fun ImmutableArray.isEmpty() =
     """
-    /** The range of valid indices. */
-    public val $immutableArrayType.indices: IntRange
-        get() = 0..<size
+    /** Returns whether this array is empty. */
+    public fun $immutableArrayType.isEmpty(): Boolean {
+        return size == 0
+    }
+    """
+        .trimIndent()
+
+// language=kotlin
+private fun ImmutableArray.isNotEmpty() =
+    """
+    /** Returns whether this array is not empty. */
+    public fun $immutableArrayType.isNotEmpty(): Boolean {
+        return !isEmpty()
+    }
     """
         .trimIndent()
 
@@ -185,24 +199,16 @@ private fun ImmutableArray.lastIndex() =
         .trimIndent()
 
 // language=kotlin
-private fun ImmutableArray.asList() =
+private fun ImmutableArray.indices() =
     """
-    /** Returns an immutable [List] which contains the elements of this array. */
-    public fun $immutableArrayType.asList(): List<$elementType> {
-        return object : AbstractList<$elementType>() {
-            override fun get(index: Int): $elementType {
-                return this@asList[index]
-            }
-    
-            override val size: Int
-                get() = this@asList.size
-        }
-    }
+    /** The range of valid indices. */
+    public val $immutableArrayType.indices: IntRange
+        get() = IntRange(0, lastIndex)
     """
         .trimIndent()
 
 // language=kotlin
-private fun ImmutableArray.asList1() =
+private fun ImmutableArray.asList() =
     """
     /** Returns an immutable [List] which contains the elements of this array. */
     public fun $immutableArrayType.asList(): List<$elementType> {
@@ -248,6 +254,24 @@ private fun ImmutableArray.indexOf() =
         .trimIndent()
 
 // language=kotlin
+private fun ImmutableArray.lastIndexOf() =
+    """
+    /**
+     * Returns the index of the last occurrence of the given [value] in this array,
+     * or -1 if this array does not contain the given value.
+     */
+    public fun $immutableArrayType.lastIndexOf(value: $elementType): Int {
+        for (dataIndex in (dataStart..<dataEnd).reversed()) {
+            if (value == data[dataIndex]) {
+                return dataIndex - dataStart
+            }
+        }
+        return -1
+    }
+    """
+        .trimIndent()
+
+// language=kotlin
 private fun ImmutableArray.sliceArray() =
     """
     /**
@@ -276,24 +300,6 @@ private fun ImmutableArray.toMutableArray() =
     /** Returns a new mutable array which contains the elements of this array. */
     public fun $immutableArrayType.toMutableArray(): $arrayType {
         return data.copyOfRange(dataStart, dataEnd)
-    }
-    """
-        .trimIndent()
-
-// language=kotlin
-private fun ImmutableArray.lastIndexOf() =
-    """
-    /**
-     * Returns the index of the last occurrence of the given [value] in this array,
-     * or -1 if this array does not contain the given value.
-     */
-    public fun $immutableArrayType.lastIndexOf(value: $elementType): Int {
-        for (dataIndex in (dataStart..<dataEnd).reversed()) {
-            if (value == data[dataIndex]) {
-                return dataIndex - dataStart
-            }
-        }
-        return -1
     }
     """
         .trimIndent()
