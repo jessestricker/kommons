@@ -7,6 +7,6 @@ plugins {
 
 spotless {
     kotlin {
-        ktfmt().kotlinlangStyle()
+        ktfmt(libs.versions.ktfmt.get()).kotlinlangStyle()
     }
 }

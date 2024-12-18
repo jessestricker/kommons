@@ -46,11 +46,11 @@ spotless {
         target(kotlin.sourceSets.map { it.kotlin })
         targetExclude(fileTree(generateImmutableArrays.outputDirectory))
 
-        ktfmt().kotlinlangStyle()
+        ktfmt(libs.versions.ktfmt.get()).kotlinlangStyle()
     }
     format("generated", KotlinExtension::class.java) {
         target(generateImmutableArrays.outputDirectory)
 
-        ktfmt().kotlinlangStyle()
+        ktfmt(libs.versions.ktfmt.get()).kotlinlangStyle()
     }
 }

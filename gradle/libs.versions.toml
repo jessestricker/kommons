@@ -3,6 +3,7 @@ kotlin = "2.1.0"
 
 detekt = "1.23.7"
 dokka = "2.0.0"
+ktfmt = "0.53"
 spotless = "7.0.0.BETA4"
 
 [plugins]
