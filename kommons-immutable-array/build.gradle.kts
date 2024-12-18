@@ -4,7 +4,7 @@ plugins {
 
     alias(libs.plugins.detekt)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.ktfmt)
+    alias(libs.plugins.spotless)
 }
 
 kotlin {
@@ -28,6 +28,9 @@ kotlin {
     }
 }
 
-ktfmt {
-    kotlinLangStyle()
+spotless {
+    kotlin {
+        target(kotlin.sourceSets.map { it.kotlin })
+        ktfmt(libs.versions.ktfmt.get()).kotlinlangStyle()
+    }
 }
