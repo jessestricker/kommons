@@ -1,3 +1,8 @@
+/*
+ * The source code in this file is auto-generated, do not edit manually.
+ * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ */
+
 package kommons
 
 import kommons.internal.requireIndex
@@ -62,7 +67,7 @@ internal constructor(
 
 /**
  * Creates an immutable array of doubles of the given [size], with every element initialized to
- * zero.
+ * `0.0`.
  */
 public fun ImmutableDoubleArray(size: Int): ImmutableDoubleArray {
     return ImmutableDoubleArray(DoubleArray(size))
@@ -100,23 +105,41 @@ public fun DoubleArray.toImmutableArray(startIndex: Int, endIndex: Int): Immutab
     return ImmutableDoubleArray(this.copyOfRange(startIndex, endIndex))
 }
 
-/** The range of valid indices. */
-public val ImmutableDoubleArray.indices: IntRange
-    get() = 0..<size
+/** Returns whether this array is empty. */
+public fun ImmutableDoubleArray.isEmpty(): Boolean {
+    return size == 0
+}
+
+/** Returns whether this array is not empty. */
+public fun ImmutableDoubleArray.isNotEmpty(): Boolean {
+    return !isEmpty()
+}
 
 /** The last valid index. */
 public val ImmutableDoubleArray.lastIndex: Int
     get() = size - 1
 
+/** The range of valid indices. */
+public val ImmutableDoubleArray.indices: IntRange
+    get() = IntRange(0, lastIndex)
+
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableDoubleArray.asList(): List<Double> {
-    return object : AbstractList<Double>() {
-        override fun get(index: Int): Double {
-            return this@asList[index]
-        }
-
+    return object : AbstractList<Double>(), RandomAccess {
         override val size: Int
             get() = this@asList.size
+
+        override fun contains(element: Double): Boolean = this@asList.contains(element)
+
+        override fun get(index: Int): Double = this@asList[index]
+
+        override fun indexOf(element: Double): Int = this@asList.indexOf(element)
+
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+
+        override fun iterator(): Iterator<Double> = this@asList.iterator()
+
+        override fun lastIndexOf(element: Double): Int = this@asList.lastIndexOf(element)
     }
 }
 
@@ -131,6 +154,19 @@ public operator fun ImmutableDoubleArray.contains(element: Double): Boolean {
  */
 public fun ImmutableDoubleArray.indexOf(value: Double): Int {
     for (dataIndex in dataStart..<dataEnd) {
+        if (value == data[dataIndex]) {
+            return dataIndex - dataStart
+        }
+    }
+    return -1
+}
+
+/**
+ * Returns the index of the last occurrence of the given [value] in this array, or -1 if this array
+ * does not contain the given value.
+ */
+public fun ImmutableDoubleArray.lastIndexOf(value: Double): Int {
+    for (dataIndex in (dataStart..<dataEnd).reversed()) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
         }

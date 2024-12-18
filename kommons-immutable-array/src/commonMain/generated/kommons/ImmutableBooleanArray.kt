@@ -1,3 +1,8 @@
+/*
+ * The source code in this file is auto-generated, do not edit manually.
+ * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ */
+
 package kommons
 
 import kommons.internal.requireIndex
@@ -100,23 +105,41 @@ public fun BooleanArray.toImmutableArray(startIndex: Int, endIndex: Int): Immuta
     return ImmutableBooleanArray(this.copyOfRange(startIndex, endIndex))
 }
 
-/** The range of valid indices. */
-public val ImmutableBooleanArray.indices: IntRange
-    get() = 0..<size
+/** Returns whether this array is empty. */
+public fun ImmutableBooleanArray.isEmpty(): Boolean {
+    return size == 0
+}
+
+/** Returns whether this array is not empty. */
+public fun ImmutableBooleanArray.isNotEmpty(): Boolean {
+    return !isEmpty()
+}
 
 /** The last valid index. */
 public val ImmutableBooleanArray.lastIndex: Int
     get() = size - 1
 
+/** The range of valid indices. */
+public val ImmutableBooleanArray.indices: IntRange
+    get() = IntRange(0, lastIndex)
+
 /** Returns an immutable [List] which contains the elements of this array. */
 public fun ImmutableBooleanArray.asList(): List<Boolean> {
-    return object : AbstractList<Boolean>() {
-        override fun get(index: Int): Boolean {
-            return this@asList[index]
-        }
-
+    return object : AbstractList<Boolean>(), RandomAccess {
         override val size: Int
             get() = this@asList.size
+
+        override fun contains(element: Boolean): Boolean = this@asList.contains(element)
+
+        override fun get(index: Int): Boolean = this@asList[index]
+
+        override fun indexOf(element: Boolean): Int = this@asList.indexOf(element)
+
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+
+        override fun iterator(): Iterator<Boolean> = this@asList.iterator()
+
+        override fun lastIndexOf(element: Boolean): Int = this@asList.lastIndexOf(element)
     }
 }
 
@@ -131,6 +154,19 @@ public operator fun ImmutableBooleanArray.contains(element: Boolean): Boolean {
  */
 public fun ImmutableBooleanArray.indexOf(value: Boolean): Int {
     for (dataIndex in dataStart..<dataEnd) {
+        if (value == data[dataIndex]) {
+            return dataIndex - dataStart
+        }
+    }
+    return -1
+}
+
+/**
+ * Returns the index of the last occurrence of the given [value] in this array, or -1 if this array
+ * does not contain the given value.
+ */
+public fun ImmutableBooleanArray.lastIndexOf(value: Boolean): Int {
+    for (dataIndex in (dataStart..<dataEnd).reversed()) {
         if (value == data[dataIndex]) {
             return dataIndex - dataStart
         }
