@@ -1,9 +1,9 @@
 /*
  * The source code in this file is auto-generated, do not edit manually.
- * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ * Generator: kommons-immutable-array/generator/src/main/kotlin/Generator.kt
  */
 
-@file:Suppress("TooManyFunctions")
+@file:Suppress("detekt:MagicNumber", "detekt:ReturnCount", "detekt:TooManyFunctions")
 
 package kommons
 
@@ -20,6 +20,12 @@ internal constructor(
 ) {
     // 0 <= dataStart <= dataEnd <= data.size
 
+    /**
+     * Creates an immutable array of unsigned shorts of the given [size], with every element
+     * initialized to zero.
+     */
+    public constructor(size: Int) : this(UShortArray(size))
+
     /** The number of elements. */
     public val size: Int
         get() = dataEnd - dataStart
@@ -30,7 +36,7 @@ internal constructor(
      * @throws[IndexOutOfBoundsException] if the given [index] is out of bounds.
      */
     public operator fun get(index: Int): UShort {
-        requireIndex(index, size)
+        requireIndex(index in 0..<size) { "index $index must be within range 0..<$size" }
         return data[dataStart + index]
     }
 
@@ -56,41 +62,16 @@ internal constructor(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ImmutableUShortArray
-
-        if (data == other.data && dataStart == other.dataStart && dataEnd == other.dataEnd)
-            return true
-        if (size != other.size) return false
-
-        var dataIndex = dataStart
-        var otherDataIndex = other.dataStart
-        while (dataIndex < dataEnd) {
-            if (data[dataIndex++] != other.data[otherDataIndex++]) {
-                return false
-            }
-        }
-        return true
+        return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
     override fun hashCode(): Int {
-        var result = 1
-        for (dataIndex in dataStart..<dataEnd) {
-            result = 31 * result + data[dataIndex].hashCode()
-        }
-        return result
+        return data.contentHashCode(dataStart, dataEnd)
     }
 
     override fun toString(): String {
         return "ImmutableUShortArray(size=$size)"
     }
-}
-
-/**
- * Creates an immutable array of unsigned shorts of the given [size], with every element initialized
- * to `0u`.
- */
-@ExperimentalUnsignedTypes
-public fun ImmutableUShortArray(size: Int): ImmutableUShortArray {
-    return ImmutableUShortArray(UShortArray(size))
 }
 
 /**
@@ -105,7 +86,7 @@ public inline fun ImmutableUShortArray(
     return ImmutableUShortArray(UShortArray(size) { init(it) })
 }
 
-/** Creates a new immutable array of unsigned shorts which contains the given [elements]. */
+/** Creates an immutable array of unsigned shorts which contains the given [elements]. */
 @ExperimentalUnsignedTypes
 public fun immutableUShortArrayOf(vararg elements: UShort): ImmutableUShortArray {
     return ImmutableUShortArray(elements)
@@ -118,8 +99,8 @@ public fun UShortArray.toImmutableArray(): ImmutableUShortArray {
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array from given [startIndex]
- * (inclusive) to the given [endIndex] (exclusive).
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
  * than [endIndex], or [endIndex] is greater than [size][ImmutableUShortArray.size].
@@ -129,16 +110,27 @@ public fun UShortArray.toImmutableArray(startIndex: Int, endIndex: Int): Immutab
     return ImmutableUShortArray(this.copyOfRange(startIndex, endIndex))
 }
 
-/** Returns whether this array is empty. */
+/** Returns a new mutable array which contains the elements of this array. */
 @ExperimentalUnsignedTypes
-public fun ImmutableUShortArray.isEmpty(): Boolean {
-    return size == 0
+public fun ImmutableUShortArray.toMutableArray(): UShortArray {
+    return data.copyOfRange(dataStart, dataEnd)
 }
 
-/** Returns whether this array is not empty. */
+/**
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
+ *
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableUShortArray.size].
+ */
 @ExperimentalUnsignedTypes
-public fun ImmutableUShortArray.isNotEmpty(): Boolean {
-    return !isEmpty()
+public fun ImmutableUShortArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableUShortArray {
+    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
+    require(startIndex <= endIndex) {
+        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
+    }
+    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
+    return ImmutableUShortArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** The last valid index. */
@@ -149,33 +141,18 @@ public val ImmutableUShortArray.lastIndex: Int
 /** The range of valid indices. */
 @ExperimentalUnsignedTypes
 public val ImmutableUShortArray.indices: IntRange
-    get() = IntRange(0, lastIndex)
+    get() = 0..<size
 
-/** Returns an immutable [List] which contains the elements of this array. */
+/** Returns whether this array is empty. */
 @ExperimentalUnsignedTypes
-public fun ImmutableUShortArray.asList(): List<UShort> {
-    return object : AbstractList<UShort>(), RandomAccess {
-        override val size: Int
-            get() = this@asList.size
-
-        override fun contains(element: UShort): Boolean = this@asList.contains(element)
-
-        override fun get(index: Int): UShort = this@asList[index]
-
-        override fun indexOf(element: UShort): Int = this@asList.indexOf(element)
-
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-
-        override fun iterator(): Iterator<UShort> = this@asList.iterator()
-
-        override fun lastIndexOf(element: UShort): Int = this@asList.lastIndexOf(element)
-    }
+public fun ImmutableUShortArray.isEmpty(): Boolean {
+    return size == 0
 }
 
-/** Returns whether this array contains the given [element]. */
+/** Returns whether this array is not empty. */
 @ExperimentalUnsignedTypes
-public operator fun ImmutableUShortArray.contains(element: UShort): Boolean {
-    return indexOf(element) != -1
+public fun ImmutableUShortArray.isNotEmpty(): Boolean {
+    return size != 0
 }
 
 /**
@@ -206,27 +183,29 @@ public fun ImmutableUShortArray.lastIndexOf(value: UShort): Int {
     return -1
 }
 
-/**
- * Returns a new immutable array which contains the elements of this array from the given
- * [startIndex] (inclusive) to the given [endIndex] (exclusive).
- *
- * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableUShortArray.size].
- */
+/** Returns whether this array contains the given [element]. */
 @ExperimentalUnsignedTypes
-public fun ImmutableUShortArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableUShortArray {
-    // 0 <= startIndex <= endIndex <= size
-    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
-    require(startIndex <= endIndex) {
-        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
-    }
-    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
-
-    return ImmutableUShortArray(data, dataStart + startIndex, dataStart + endIndex)
+public operator fun ImmutableUShortArray.contains(element: UShort): Boolean {
+    return indexOf(element) != -1
 }
 
-/** Returns a new mutable array which contains the elements of this array. */
+/** Returns an immutable [List] which contains the elements of this array. */
 @ExperimentalUnsignedTypes
-public fun ImmutableUShortArray.toMutableArray(): UShortArray {
-    return data.copyOfRange(dataStart, dataEnd)
+public fun ImmutableUShortArray.asList(): List<UShort> {
+    return object : AbstractList<UShort>(), RandomAccess {
+        override val size: Int
+            get() = this@asList.size
+
+        override fun contains(element: UShort): Boolean = this@asList.contains(element)
+
+        override fun get(index: Int): UShort = this@asList[index]
+
+        override fun indexOf(element: UShort): Int = this@asList.indexOf(element)
+
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+
+        override fun iterator(): Iterator<UShort> = this@asList.iterator()
+
+        override fun lastIndexOf(element: UShort): Int = this@asList.lastIndexOf(element)
+    }
 }

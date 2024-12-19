@@ -7,4 +7,7 @@ dependencyResolutionManagement {
     }
 }
 
-include("kommons-immutable-array")
+include(
+    "kommons-immutable-array",
+    "kommons-immutable-array:generator",
+)

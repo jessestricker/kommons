@@ -1,9 +1,9 @@
 /*
  * The source code in this file is auto-generated, do not edit manually.
- * Generator: kommons.buildsrc.immutablearray.ImmutableArraysGenerator
+ * Generator: kommons-immutable-array/generator/src/main/kotlin/Generator.kt
  */
 
-@file:Suppress("TooManyFunctions")
+@file:Suppress("detekt:MagicNumber", "detekt:ReturnCount", "detekt:TooManyFunctions")
 
 package kommons
 
@@ -19,6 +19,12 @@ internal constructor(
 ) {
     // 0 <= dataStart <= dataEnd <= data.size
 
+    /**
+     * Creates an immutable array of floats of the given [size], with every element initialized to
+     * zero.
+     */
+    public constructor(size: Int) : this(FloatArray(size))
+
     /** The number of elements. */
     public val size: Int
         get() = dataEnd - dataStart
@@ -29,7 +35,7 @@ internal constructor(
      * @throws[IndexOutOfBoundsException] if the given [index] is out of bounds.
      */
     public operator fun get(index: Int): Float {
-        requireIndex(index, size)
+        requireIndex(index in 0..<size) { "index $index must be within range 0..<$size" }
         return data[dataStart + index]
     }
 
@@ -55,40 +61,16 @@ internal constructor(
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         other as ImmutableFloatArray
-
-        if (data === other.data && dataStart == other.dataStart && dataEnd == other.dataEnd)
-            return true
-        if (size != other.size) return false
-
-        var dataIndex = dataStart
-        var otherDataIndex = other.dataStart
-        while (dataIndex < dataEnd) {
-            if (data[dataIndex++] != other.data[otherDataIndex++]) {
-                return false
-            }
-        }
-        return true
+        return data.contentEquals(dataStart, dataEnd, other.data, other.dataStart, other.dataEnd)
     }
 
     override fun hashCode(): Int {
-        var result = 1
-        for (dataIndex in dataStart..<dataEnd) {
-            result = 31 * result + data[dataIndex].hashCode()
-        }
-        return result
+        return data.contentHashCode(dataStart, dataEnd)
     }
 
     override fun toString(): String {
         return "ImmutableFloatArray(size=$size)"
     }
-}
-
-/**
- * Creates an immutable array of floats of the given [size], with every element initialized to
- * `0.0f`.
- */
-public fun ImmutableFloatArray(size: Int): ImmutableFloatArray {
-    return ImmutableFloatArray(FloatArray(size))
 }
 
 /**
@@ -99,7 +81,7 @@ public inline fun ImmutableFloatArray(size: Int, init: (index: Int) -> Float): I
     return ImmutableFloatArray(FloatArray(size) { init(it) })
 }
 
-/** Creates a new immutable array of floats which contains the given [elements]. */
+/** Creates an immutable array of floats which contains the given [elements]. */
 public fun immutableFloatArrayOf(vararg elements: Float): ImmutableFloatArray {
     return ImmutableFloatArray(elements)
 }
@@ -110,8 +92,8 @@ public fun FloatArray.toImmutableArray(): ImmutableFloatArray {
 }
 
 /**
- * Returns a new immutable array which contains the elements of this array from given [startIndex]
- * (inclusive) to the given [endIndex] (exclusive).
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
  *
  * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
  * than [endIndex], or [endIndex] is greater than [size][ImmutableFloatArray.size].
@@ -120,14 +102,25 @@ public fun FloatArray.toImmutableArray(startIndex: Int, endIndex: Int): Immutabl
     return ImmutableFloatArray(this.copyOfRange(startIndex, endIndex))
 }
 
-/** Returns whether this array is empty. */
-public fun ImmutableFloatArray.isEmpty(): Boolean {
-    return size == 0
+/** Returns a new mutable array which contains the elements of this array. */
+public fun ImmutableFloatArray.toMutableArray(): FloatArray {
+    return data.copyOfRange(dataStart, dataEnd)
 }
 
-/** Returns whether this array is not empty. */
-public fun ImmutableFloatArray.isNotEmpty(): Boolean {
-    return !isEmpty()
+/**
+ * Returns a new immutable array which contains the elements of this array from the given
+ * [startIndex] (inclusive) to the given [endIndex] (exclusive).
+ *
+ * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
+ * than [endIndex], or [endIndex] is greater than [size][ImmutableFloatArray.size].
+ */
+public fun ImmutableFloatArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableFloatArray {
+    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
+    require(startIndex <= endIndex) {
+        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
+    }
+    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
+    return ImmutableFloatArray(data, dataStart + startIndex, dataStart + endIndex)
 }
 
 /** The last valid index. */
@@ -136,31 +129,16 @@ public val ImmutableFloatArray.lastIndex: Int
 
 /** The range of valid indices. */
 public val ImmutableFloatArray.indices: IntRange
-    get() = IntRange(0, lastIndex)
+    get() = 0..<size
 
-/** Returns an immutable [List] which contains the elements of this array. */
-public fun ImmutableFloatArray.asList(): List<Float> {
-    return object : AbstractList<Float>(), RandomAccess {
-        override val size: Int
-            get() = this@asList.size
-
-        override fun contains(element: Float): Boolean = this@asList.contains(element)
-
-        override fun get(index: Int): Float = this@asList[index]
-
-        override fun indexOf(element: Float): Int = this@asList.indexOf(element)
-
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-
-        override fun iterator(): Iterator<Float> = this@asList.iterator()
-
-        override fun lastIndexOf(element: Float): Int = this@asList.lastIndexOf(element)
-    }
+/** Returns whether this array is empty. */
+public fun ImmutableFloatArray.isEmpty(): Boolean {
+    return size == 0
 }
 
-/** Returns whether this array contains the given [element]. */
-public operator fun ImmutableFloatArray.contains(element: Float): Boolean {
-    return indexOf(element) != -1
+/** Returns whether this array is not empty. */
+public fun ImmutableFloatArray.isNotEmpty(): Boolean {
+    return size != 0
 }
 
 /**
@@ -189,25 +167,27 @@ public fun ImmutableFloatArray.lastIndexOf(value: Float): Int {
     return -1
 }
 
-/**
- * Returns a new immutable array which contains the elements of this array from the given
- * [startIndex] (inclusive) to the given [endIndex] (exclusive).
- *
- * @throws[IllegalArgumentException] if [startIndex] is less than zero, or [startIndex] is greater
- * than [endIndex], or [endIndex] is greater than [size][ImmutableFloatArray.size].
- */
-public fun ImmutableFloatArray.sliceArray(startIndex: Int, endIndex: Int): ImmutableFloatArray {
-    // 0 <= startIndex <= endIndex <= size
-    require(0 <= startIndex) { "startIndex $startIndex must be greater than or equal to 0" }
-    require(startIndex <= endIndex) {
-        "startIndex $startIndex must be less than or equal to endIndex $endIndex"
-    }
-    require(endIndex <= size) { "endIndex $endIndex must be less than or equal to size $size" }
-
-    return ImmutableFloatArray(data, dataStart + startIndex, dataStart + endIndex)
+/** Returns whether this array contains the given [element]. */
+public operator fun ImmutableFloatArray.contains(element: Float): Boolean {
+    return indexOf(element) != -1
 }
 
-/** Returns a new mutable array which contains the elements of this array. */
-public fun ImmutableFloatArray.toMutableArray(): FloatArray {
-    return data.copyOfRange(dataStart, dataEnd)
+/** Returns an immutable [List] which contains the elements of this array. */
+public fun ImmutableFloatArray.asList(): List<Float> {
+    return object : AbstractList<Float>(), RandomAccess {
+        override val size: Int
+            get() = this@asList.size
+
+        override fun contains(element: Float): Boolean = this@asList.contains(element)
+
+        override fun get(index: Int): Float = this@asList[index]
+
+        override fun indexOf(element: Float): Int = this@asList.indexOf(element)
+
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+
+        override fun iterator(): Iterator<Float> = this@asList.iterator()
+
+        override fun lastIndexOf(element: Float): Int = this@asList.lastIndexOf(element)
+    }
 }
