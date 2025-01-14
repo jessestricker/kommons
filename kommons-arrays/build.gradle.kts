@@ -2,12 +2,6 @@ plugins {
     id("kommons.kotlin-library")
 }
 
-val generatedSourceDirectory = file("src/main/generated/kotlin")
-
-sourceSets.main {
-    kotlin.srcDir(generatedSourceDirectory)
-}
-
 val generatorSourceSet = sourceSets.register("generator")
 
 tasks.register<JavaExec>("generate") {
@@ -17,7 +11,7 @@ tasks.register<JavaExec>("generate") {
     classpath = generatorSourceSet.get().runtimeClasspath
     mainClass = "Generator"
     args = listOf(
-        generatedSourceDirectory.toString(), // source directory
+        file("src/main/kotlin").toString(), // source directory
         "kommons.arrays", // package name
     )
 }
