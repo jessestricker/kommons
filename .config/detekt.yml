@@ -1,0 +1,13 @@
+style:
+  AlsoCouldBeApply:
+    active: true
+  BracesOnIfStatements:
+    active: true
+    singleLine: 'never'
+    multiLine: 'always'
+  BracesOnWhenStatements:
+    active: true
+    singleLine: 'never'
+    multiLine: 'always'
+  MaxLineLength:
+    active: false

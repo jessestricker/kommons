@@ -1,0 +1,14 @@
+[versions]
+java = "21"
+kotlin = "2.1.0"
+
+detekt = "1.23.7"
+dokka = "2.0.0"
+ktfmt-gradle = "0.21.0"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt-gradle" }
