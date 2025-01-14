@@ -5,3 +5,7 @@ plugins {
 rootProject.name = "kommons"
 
 includeBuild("build-logic")
+
+include(
+    "kommons-arrays",
+)
