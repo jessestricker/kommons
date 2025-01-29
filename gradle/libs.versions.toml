@@ -1,6 +1,6 @@
 [versions]
 java = "21"
-kotlin = "2.1.0"
+kotlin = "2.1.10"
 
 detekt = "1.23.7"
 dokka = "2.0.0"
