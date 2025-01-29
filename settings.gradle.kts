@@ -8,4 +8,5 @@ includeBuild("build-logic")
 
 include(
     "kommons-arrays",
+    "kommons-hash",
 )
