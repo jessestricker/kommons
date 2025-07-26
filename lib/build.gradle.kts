@@ -15,6 +15,7 @@ kotlin {
         }
     }
 
+    explicitApi()
     compilerOptions {
         progressiveMode = true
         extraWarnings = true
