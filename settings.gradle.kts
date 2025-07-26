@@ -4,4 +4,4 @@ plugins {
 
 rootProject.name = "kommons"
 
-include("lib")
+include("kommons-hash")
