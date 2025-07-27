@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 
     alias(libs.plugins.detekt)
+    alias(libs.plugins.ktfmt)
 }
 
 repositories {
@@ -32,3 +33,9 @@ detekt {
 tasks.withType<Detekt>{
     jvmTarget = "1.8"
 }
+
+ktfmt {
+    kotlinLangStyle()
+}
+tasks.ktfmtFormatScripts { enabled = false }
+tasks.ktfmtCheckScripts { enabled = false }
