@@ -5,8 +5,8 @@ import kotlin.test.assertTrue
 
 class LibraryTest {
     @Test
-    fun someLibraryMethodReturnsTrue() {
+    fun someLibraryPropertyReturnsTrue() {
         val classUnderTest = Library()
-        assertTrue(classUnderTest.someLibraryMethod(), "someLibraryMethod should return 'true'")
+        assertTrue(classUnderTest.someLibraryProperty, "someLibraryProperty should return 'true'")
     }
 }

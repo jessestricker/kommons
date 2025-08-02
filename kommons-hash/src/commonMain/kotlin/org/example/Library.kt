@@ -1,7 +1,6 @@
 package org.example
 
 public class Library {
-    public fun someLibraryMethod(): Boolean {
-        return true
-    }
+    public val someLibraryProperty: Boolean
+        get() = true
 }
