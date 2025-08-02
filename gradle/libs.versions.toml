@@ -5,6 +5,7 @@ kotlin = "2.2.0"
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
+dokka = "org.jetbrains.dokka:2.0.0"
 ktfmt = "com.ncorti.ktfmt.gradle:0.23.0"
 
 [libraries]
