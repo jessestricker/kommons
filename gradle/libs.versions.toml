@@ -6,3 +6,6 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 
 detekt = "io.gitlab.arturbosch.detekt:1.23.8"
 ktfmt = "com.ncorti.ktfmt.gradle:0.23.0"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }

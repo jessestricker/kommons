@@ -17,6 +17,12 @@ kotlin {
     macosArm64()
     mingwX64()
 
+    sourceSets.commonTest {
+        dependencies {
+            implementation(libs.kotlin.test)
+        }
+    }
+
     explicitApi()
     compilerOptions {
         progressiveMode = true
