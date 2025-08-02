@@ -1,0 +1,37 @@
+name: Upgrade Gradle
+on:
+  schedule:
+    - cron: "0 0 * * MON"
+  workflow_dispatch:
+jobs:
+  upgrade-gradle:
+    name: Upgrade Gradle
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Java
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          java-version: 24
+          distribution: temurin
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96 # v4.4.1
+      - name: Get latest version
+        run: |
+          version_info=$(curl 'https://services.gradle.org/versions/current')
+          latest_version=$(echo "$version_info" | jq --raw-output '.version')
+          echo "latest_version=$latest_version" >>"$GITHUB_ENV"
+      - name: Upgrade Gradle
+        run: |
+          ./gradlew wrapper --gradle-version "$latest_version"
+          ./gradlew wrapper
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          branch: "chore/upgrade-gradle"
+          commit-message: "chore(deps): bump Gradle to ${{ env.latest_version }}"
+          title: "chore(deps): bump Gradle to ${{ env.latest_version }}"
+          labels: dependencies, gradle
+          body: |
+            Upgrades Gradle to [${{ env.latest_version }}](https://docs.gradle.org/${{ env.latest_version }}/release-notes.html).
