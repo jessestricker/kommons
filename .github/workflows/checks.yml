@@ -12,6 +12,12 @@ jobs:
         include:
           - os: ubuntu-24.04
             task: jvmTest
+          - os: ubuntu-24.04
+            task: linuxX64Test
+          - os: macos-15
+            task: macosArm64Test
+          - os: windows-2025
+            task: mingwX64Test
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout

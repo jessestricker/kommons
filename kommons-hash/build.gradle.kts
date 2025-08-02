@@ -13,12 +13,9 @@ repositories {
 
 kotlin {
     jvm()
-
-    sourceSets {
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-        }
-    }
+    linuxX64()
+    macosArm64()
+    mingwX64()
 
     explicitApi()
     compilerOptions {
