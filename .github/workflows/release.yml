@@ -20,6 +20,15 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
+      - name: Setup Node.js environment
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: lts/*
+          cache: npm
+      - name: Install dependencies
+        run: |
+          npm install --global semantic-release@24
+          npm install --global conventional-changelog-conventionalcommits@9
       - name: Configure semantic-release
         run: |
           cat >.releaserc.yaml <<EOL
@@ -32,9 +41,4 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          npx
-          --package semantic-release@24
-          --package conventional-changelog-conventionalcommits@9
-          --
-          semantic-release
+        run: semantic-release
