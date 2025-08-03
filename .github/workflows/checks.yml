@@ -6,18 +6,18 @@ on:
     branches: [ main ]
 jobs:
   test:
-    name: Test
     strategy:
       matrix:
         include:
           - os: ubuntu-24.04
-            task: jvmTest
+            target: jvm
           - os: ubuntu-24.04
-            task: linuxX64Test
+            target: linuxX64
           - os: macos-15
-            task: macosArm64Test
+            target: macosArm64
           - os: windows-2025
-            task: mingwX64Test
+            target: mingwX64
+    name: Test (${{ matrix.target }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -30,7 +30,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96 # v4.4.1
       - name: Run tests
-        run: ./gradlew ${{ matrix.task }}
+        run: ./gradlew ${{ matrix.target }}Test
   lint:
     name: Lint
     runs-on: ubuntu-24.04
