@@ -7,6 +7,7 @@ jobs:
   checks:
     name: Checks
     uses: ./.github/workflows/checks.yml
+    secrets: inherit
   release:
     name: Release
     needs: [checks]
