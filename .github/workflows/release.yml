@@ -26,19 +26,8 @@ jobs:
           node-version: lts/*
           cache: npm
       - name: Install dependencies
-        run: |
-          npm install --global semantic-release@24
-          npm install --global conventional-changelog-conventionalcommits@9
-      - name: Configure semantic-release
-        run: |
-          cat >.releaserc.yaml <<EOL
-          preset: conventionalcommits
-          plugins:
-            - "@semantic-release/commit-analyzer"
-            - "@semantic-release/release-notes-generator"
-            - "@semantic-release/github"
-          EOL
+        run: npm clean-install
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: semantic-release
+        run: npx semantic-release
