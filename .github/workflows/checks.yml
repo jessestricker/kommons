@@ -75,4 +75,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@ac638b010cf58a27ee6c972d7336334ccaf61c96 # v4.4.1
       - name: Run dokka
-        run: ./gradlew dokkaGenerate
+        run: ./gradlew :dokkaGenerate
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: documentation
+          path: build/dokka/html
