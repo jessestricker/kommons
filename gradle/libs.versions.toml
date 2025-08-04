@@ -10,3 +10,4 @@ ktfmt = "com.ncorti.ktfmt.gradle:0.23.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
+square-kotlinpoet = "com.squareup:kotlinpoet:2.2.0"
