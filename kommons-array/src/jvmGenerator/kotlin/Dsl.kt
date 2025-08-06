@@ -5,6 +5,13 @@ import com.squareup.kotlinpoet.*
 inline fun FileSpec(name: ClassName, block: FileSpec.Builder.() -> Unit = {}): FileSpec =
     FileSpec.builder(name).apply(block).build()
 
+// annotation
+
+inline fun AnnotationSpec(
+    type: ClassName,
+    block: AnnotationSpec.Builder.() -> Unit = {},
+): AnnotationSpec = AnnotationSpec.builder(type).apply(block).build()
+
 // type
 
 inline fun ClassSpec(name: ClassName, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec =

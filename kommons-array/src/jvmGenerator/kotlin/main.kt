@@ -1,5 +1,4 @@
 import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import kotlin.io.path.Path
 
@@ -20,20 +19,31 @@ val GENERATORS =
         Generator(CHAR, "chars", CHAR_ARRAY, CharIterator::class.asTypeName()),
         Generator(FLOAT, "floats", FLOAT_ARRAY, FloatIterator::class.asTypeName()),
         Generator(DOUBLE, "doubles", DOUBLE_ARRAY, DoubleIterator::class.asTypeName()),
+        Generator(U_BYTE, "unsigned bytes", U_BYTE_ARRAY, typeNameOf<Iterator<UByte>>()),
+        Generator(U_SHORT, "unsigned shorts", U_SHORT_ARRAY, typeNameOf<Iterator<UShort>>()),
+        Generator(U_INT, "unsigned ints", U_INT_ARRAY, typeNameOf<Iterator<UInt>>()),
+        Generator(U_LONG, "unsigned longs", U_LONG_ARRAY, typeNameOf<Iterator<ULong>>()),
     )
 
 class Generator(
     val elementType: ClassName,
     val elementPluralName: String,
     val arrayType: ClassName,
-    val iteratorType: ClassName,
+    val iteratorType: TypeName,
 ) {
     companion object {
         const val PACKAGE_NAME = "de.jessestricker.kommons.array"
         val DELICATE_API_ANNOTATION = ClassName(PACKAGE_NAME, "DelicateKommonsArrayApi")
+
         val SORTABLE_TYPES = setOf(BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE)
         val FLOATING_POINT_TYPES = setOf(FLOAT, DOUBLE)
+        val UNSIGNED_TYPES = setOf(U_BYTE, U_SHORT, U_INT, U_LONG)
     }
+
+    val baseAnnotations =
+        if (elementType in UNSIGNED_TYPES)
+            listOf(AnnotationSpec(ExperimentalUnsignedTypes::class.asTypeName()))
+        else emptyList()
 
     val immutableArrayType = ClassName(PACKAGE_NAME, "Immutable${arrayType.simpleName}")
 
@@ -43,6 +53,7 @@ class Generator(
     val immutableArray =
         ClassSpec(immutableArrayType) {
             addKdoc("An immutable array of %L.", elementPluralName)
+            addAnnotations(baseAnnotations)
             addAnnotation(JvmInline::class)
             addModifiers(KModifier.VALUE)
 
@@ -99,18 +110,21 @@ class Generator(
 
     val indices =
         PropertySpec("indices", IntRange::class.asTypeName()) {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             getter { addStatement("return %N.indices", storage) }
         }
 
     val lastIndex =
         PropertySpec("lastIndex", INT) {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             getter { addStatement("return %N.lastIndex", storage) }
         }
 
     val asImmutableArray =
         FunSpec("asImmutableArray") {
+            addAnnotations(baseAnnotations)
             addAnnotation(DELICATE_API_ANNOTATION)
             receiver(arrayType)
             returns(immutableArrayType)
@@ -119,6 +133,7 @@ class Generator(
 
     val asMutableArray =
         FunSpec("asMutableArray") {
+            addAnnotations(baseAnnotations)
             addAnnotation(DELICATE_API_ANNOTATION)
             receiver(immutableArrayType)
             returns(arrayType)
@@ -127,6 +142,7 @@ class Generator(
 
     val toImmutableArray =
         FunSpec("toImmutableArray") {
+            addAnnotations(baseAnnotations)
             receiver(arrayType)
             returns(immutableArrayType)
             addStatement("return %T(copyOf())", immutableArrayType)
@@ -134,6 +150,7 @@ class Generator(
 
     val toMutableArray =
         FunSpec("toMutableArray") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(arrayType)
             addStatement("return %N.copyOf()", storage)
@@ -141,6 +158,7 @@ class Generator(
 
     val asList =
         FunSpec("asList") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(LIST.parameterizedBy(elementType))
             addStatement("return %N.asList()", storage)
@@ -148,6 +166,7 @@ class Generator(
 
     val contains =
         FunSpec("contains") {
+            addAnnotations(baseAnnotations)
             addModifiers(KModifier.OPERATOR)
             receiver(immutableArrayType)
             val element = parameter("element", elementType)
@@ -157,6 +176,7 @@ class Generator(
 
     val contentEquals =
         FunSpec("contentEquals") {
+            addAnnotations(baseAnnotations)
             addModifiers(KModifier.INFIX)
             receiver(immutableArrayType.copy(nullable = true))
             val other = parameter("other", immutableArrayType.copy(nullable = true))
@@ -166,6 +186,7 @@ class Generator(
 
     val contentHashCode =
         FunSpec("contentHashCode") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType.copy(nullable = true))
             returns(INT)
             addStatement("return this?.%N.contentHashCode()", storage)
@@ -173,6 +194,7 @@ class Generator(
 
     val contentToString =
         FunSpec("contentToString") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType.copy(nullable = true))
             returns(STRING)
             addStatement("return this?.%N.contentToString()", storage)
@@ -180,6 +202,7 @@ class Generator(
 
     val copyInto =
         FunSpec("copyInto") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             val destination = parameter("destination", arrayType)
             val destinationOffset = parameter("destinationOffset", INT) { defaultValue("0") }
@@ -198,6 +221,7 @@ class Generator(
 
     val copyOf =
         FunSpec("copyOf") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(immutableArrayType)
             addStatement("return %T(%N.copyOf())", immutableArrayType, storage)
@@ -205,6 +229,7 @@ class Generator(
 
     val copyOfNewSize =
         FunSpec("copyOf") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             val newSize = parameter("newSize", INT)
             returns(immutableArrayType)
@@ -213,6 +238,7 @@ class Generator(
 
     val copyOfRange =
         FunSpec("copyOfRange") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             val fromIndex = parameter("fromIndex", INT)
             val toIndex = parameter("toIndex", INT)
@@ -228,6 +254,7 @@ class Generator(
 
     val indexOf =
         FunSpec("indexOf") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             val element = parameter("element", elementType)
             returns(INT)
@@ -236,6 +263,7 @@ class Generator(
 
     val isEmpty =
         FunSpec("isEmpty") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(BOOLEAN)
             addStatement("return %N.isEmpty()", storage)
@@ -243,6 +271,7 @@ class Generator(
 
     val isNotEmpty =
         FunSpec("isNotEmpty") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(BOOLEAN)
             addStatement("return %N.isNotEmpty()", storage)
@@ -250,6 +279,7 @@ class Generator(
 
     val lastIndexOf =
         FunSpec("lastIndexOf") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             val element = parameter("element", elementType)
             returns(INT)
@@ -258,6 +288,7 @@ class Generator(
 
     val plusElement =
         FunSpec("plus") {
+            addAnnotations(baseAnnotations)
             addModifiers(KModifier.OPERATOR)
             receiver(immutableArrayType)
             val element = parameter("element", elementType)
@@ -267,6 +298,7 @@ class Generator(
 
     val plusElementsArray =
         FunSpec("plus") {
+            addAnnotations(baseAnnotations)
             addModifiers(KModifier.OPERATOR)
             receiver(immutableArrayType)
             val elements = parameter("elements", arrayType)
@@ -276,6 +308,7 @@ class Generator(
 
     val plusElementsImmutableArray =
         FunSpec("plus") {
+            addAnnotations(baseAnnotations)
             addModifiers(KModifier.OPERATOR)
             receiver(immutableArrayType)
             val elements = parameter("elements", immutableArrayType)
@@ -291,6 +324,7 @@ class Generator(
 
     val plusElementsCollection =
         FunSpec("plus") {
+            addAnnotations(baseAnnotations)
             addModifiers(KModifier.OPERATOR)
             receiver(immutableArrayType)
             val elements = parameter("elements", COLLECTION.parameterizedBy(elementType))
@@ -300,6 +334,7 @@ class Generator(
 
     val reversedArray =
         FunSpec("reversedArray") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(immutableArrayType)
             addStatement("return %T(%N.reversedArray())", immutableArrayType, storage)
@@ -307,6 +342,7 @@ class Generator(
 
     val sliceArrayCollection =
         FunSpec("sliceArray") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             val indices = parameter("indices", COLLECTION.parameterizedBy(INT))
             returns(immutableArrayType)
@@ -315,6 +351,7 @@ class Generator(
 
     val sliceArrayRange =
         FunSpec("sliceArray") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             val indices = parameter("indices", IntRange::class.asTypeName())
             returns(immutableArrayType)
@@ -323,6 +360,7 @@ class Generator(
 
     val sortedArray =
         FunSpec("sortedArray") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(immutableArrayType)
             addStatement("return %T(%N.sortedArray())", immutableArrayType, storage)
@@ -330,6 +368,7 @@ class Generator(
 
     val sortedArrayDescending =
         FunSpec("sortedArrayDescending") {
+            addAnnotations(baseAnnotations)
             receiver(immutableArrayType)
             returns(immutableArrayType)
             addStatement("return %T(%N.sortedArrayDescending())", immutableArrayType, storage)
