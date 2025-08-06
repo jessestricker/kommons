@@ -28,6 +28,8 @@ kotlin {
 }
 
 detekt {
+    buildUponDefaultConfig = true
+    config.setFrom(rootProject.file(".config/detekt.yml"))
     source.setFrom(kotlin.sourceSets.map { it.kotlin })
 }
 tasks.withType<Detekt> {
