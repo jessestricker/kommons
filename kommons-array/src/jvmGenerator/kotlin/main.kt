@@ -9,43 +9,36 @@ fun main(args: Array<String>) {
     }
 }
 
-val GENERATORS =
-    listOf(
-        Generator(BOOLEAN, "booleans", BOOLEAN_ARRAY, BooleanIterator::class.asTypeName()),
-        Generator(BYTE, "bytes", BYTE_ARRAY, ByteIterator::class.asTypeName()),
-        Generator(SHORT, "shorts", SHORT_ARRAY, ShortIterator::class.asTypeName()),
-        Generator(INT, "ints", INT_ARRAY, IntIterator::class.asTypeName()),
-        Generator(LONG, "longs", LONG_ARRAY, LongIterator::class.asTypeName()),
-        Generator(CHAR, "chars", CHAR_ARRAY, CharIterator::class.asTypeName()),
-        Generator(FLOAT, "floats", FLOAT_ARRAY, FloatIterator::class.asTypeName()),
-        Generator(DOUBLE, "doubles", DOUBLE_ARRAY, DoubleIterator::class.asTypeName()),
-        Generator(U_BYTE, "unsigned bytes", U_BYTE_ARRAY, typeNameOf<Iterator<UByte>>()),
-        Generator(U_SHORT, "unsigned shorts", U_SHORT_ARRAY, typeNameOf<Iterator<UShort>>()),
-        Generator(U_INT, "unsigned ints", U_INT_ARRAY, typeNameOf<Iterator<UInt>>()),
-        Generator(U_LONG, "unsigned longs", U_LONG_ARRAY, typeNameOf<Iterator<ULong>>()),
-    )
+const val PACKAGE_NAME = "de.jessestricker.kommons.array"
+val DELICATE_API_ANNOTATION = ClassName(PACKAGE_NAME, "DelicateKommonsArrayApi")
 
-class Generator(
-    val elementType: ClassName,
-    val elementPluralName: String,
-    val arrayType: ClassName,
-    val iteratorType: TypeName,
-) {
-    companion object {
-        const val PACKAGE_NAME = "de.jessestricker.kommons.array"
-        val DELICATE_API_ANNOTATION = ClassName(PACKAGE_NAME, "DelicateKommonsArrayApi")
+val SORTABLE_TYPES = setOf(BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE)
+val FLOATING_POINT_TYPES = setOf(FLOAT, DOUBLE)
+val UNSIGNED_TYPES = setOf(U_BYTE, U_SHORT, U_INT, U_LONG)
+val PRIMITIVE_TYPES = setOf(BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE)
 
-        val SORTABLE_TYPES = setOf(BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE)
-        val FLOATING_POINT_TYPES = setOf(FLOAT, DOUBLE)
-        val UNSIGNED_TYPES = setOf(U_BYTE, U_SHORT, U_INT, U_LONG)
-    }
+fun arrayTypeOf(elementType: ClassName) = elementType.peerClass("${elementType.simpleName}Array")
 
+fun immutableArrayTypeOf(elementType: ClassName) =
+    ClassName(PACKAGE_NAME, "Immutable${elementType.simpleName}Array")
+
+fun iteratorTypeOf(elementType: ClassName) =
+    if (elementType in PRIMITIVE_TYPES)
+        Iterator::class.asClassName().peerClass("${elementType.simpleName}Iterator")
+    else Iterator::class.asClassName().parameterizedBy(elementType)
+
+fun signedTypeOf(unsignedType: ClassName) =
+    unsignedType.takeIf { it in UNSIGNED_TYPES }?.peerClass(unsignedType.simpleName.drop(1))
+
+class Generator(val elementType: ClassName, val elementPluralName: String) {
     val baseAnnotations =
         if (elementType in UNSIGNED_TYPES)
             listOf(AnnotationSpec(ExperimentalUnsignedTypes::class.asTypeName()))
         else emptyList()
 
-    val immutableArrayType = ClassName(PACKAGE_NAME, "Immutable${arrayType.simpleName}")
+    val arrayType = arrayTypeOf(elementType)
+    val iteratorType = iteratorTypeOf(elementType)
+    val immutableArrayType = immutableArrayTypeOf(elementType)
 
     val storage = MemberName(immutableArrayType, "storage")
     val size = MemberName(immutableArrayType, "size")
@@ -162,6 +155,24 @@ class Generator(
             receiver(immutableArrayType)
             returns(LIST.parameterizedBy(elementType))
             addStatement("return %N.asList()", storage)
+        }
+
+    val asSignedImmutableArray =
+        signedTypeOf(elementType)?.let { signedElementType ->
+            val signedImmutableArrayType = immutableArrayTypeOf(signedElementType)
+            val signedArrayType = arrayTypeOf(signedElementType)
+
+            FunSpec("as${signedImmutableArrayType.simpleName}") {
+                addAnnotations(baseAnnotations)
+                receiver(immutableArrayType)
+                returns(signedImmutableArrayType)
+                addStatement(
+                    "return %T(%N.%N())",
+                    signedImmutableArrayType,
+                    storage,
+                    "as${signedArrayType.simpleName}",
+                )
+            }
         }
 
     val contains =
@@ -395,6 +406,7 @@ class Generator(
             addFunction(toImmutableArray)
             addFunction(toMutableArray)
             addFunction(asList)
+            asSignedImmutableArray?.let { addFunction(it) }
 
             if (elementType !in FLOATING_POINT_TYPES) {
                 addFunction(contains)
@@ -423,3 +435,19 @@ class Generator(
             }
         }
 }
+
+val GENERATORS =
+    listOf(
+        Generator(BOOLEAN, "booleans"),
+        Generator(BYTE, "bytes"),
+        Generator(SHORT, "shorts"),
+        Generator(INT, "ints"),
+        Generator(LONG, "longs"),
+        Generator(CHAR, "chars"),
+        Generator(FLOAT, "floats"),
+        Generator(DOUBLE, "doubles"),
+        Generator(U_BYTE, "unsigned bytes"),
+        Generator(U_SHORT, "unsigned shorts"),
+        Generator(U_INT, "unsigned ints"),
+        Generator(U_LONG, "unsigned longs"),
+    )

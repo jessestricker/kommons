@@ -64,6 +64,10 @@ public fun ImmutableUIntArray.toMutableArray(): UIntArray = storage.copyOf()
 @ExperimentalUnsignedTypes public fun ImmutableUIntArray.asList(): List<UInt> = storage.asList()
 
 @ExperimentalUnsignedTypes
+public fun ImmutableUIntArray.asImmutableIntArray(): ImmutableIntArray =
+    ImmutableIntArray(storage.asIntArray())
+
+@ExperimentalUnsignedTypes
 public operator fun ImmutableUIntArray.contains(element: UInt): Boolean = storage.contains(element)
 
 @ExperimentalUnsignedTypes

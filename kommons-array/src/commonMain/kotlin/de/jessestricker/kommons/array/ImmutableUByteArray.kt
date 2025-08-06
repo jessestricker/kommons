@@ -64,6 +64,10 @@ public fun ImmutableUByteArray.toMutableArray(): UByteArray = storage.copyOf()
 @ExperimentalUnsignedTypes public fun ImmutableUByteArray.asList(): List<UByte> = storage.asList()
 
 @ExperimentalUnsignedTypes
+public fun ImmutableUByteArray.asImmutableByteArray(): ImmutableByteArray =
+    ImmutableByteArray(storage.asByteArray())
+
+@ExperimentalUnsignedTypes
 public operator fun ImmutableUByteArray.contains(element: UByte): Boolean =
     storage.contains(element)
 

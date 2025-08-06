@@ -64,6 +64,10 @@ public fun ImmutableUShortArray.toMutableArray(): UShortArray = storage.copyOf()
 @ExperimentalUnsignedTypes public fun ImmutableUShortArray.asList(): List<UShort> = storage.asList()
 
 @ExperimentalUnsignedTypes
+public fun ImmutableUShortArray.asImmutableShortArray(): ImmutableShortArray =
+    ImmutableShortArray(storage.asShortArray())
+
+@ExperimentalUnsignedTypes
 public operator fun ImmutableUShortArray.contains(element: UShort): Boolean =
     storage.contains(element)
 

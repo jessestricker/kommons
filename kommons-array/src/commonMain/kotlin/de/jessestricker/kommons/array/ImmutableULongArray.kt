@@ -64,6 +64,10 @@ public fun ImmutableULongArray.toMutableArray(): ULongArray = storage.copyOf()
 @ExperimentalUnsignedTypes public fun ImmutableULongArray.asList(): List<ULong> = storage.asList()
 
 @ExperimentalUnsignedTypes
+public fun ImmutableULongArray.asImmutableLongArray(): ImmutableLongArray =
+    ImmutableLongArray(storage.asLongArray())
+
+@ExperimentalUnsignedTypes
 public operator fun ImmutableULongArray.contains(element: ULong): Boolean =
     storage.contains(element)
 
