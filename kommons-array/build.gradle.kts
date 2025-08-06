@@ -41,3 +41,21 @@ ktfmt {
 }
 tasks.ktfmtFormatScripts { enabled = false }
 tasks.ktfmtCheckScripts { enabled = false }
+
+kotlin {
+    jvm {
+        val generator by compilations.creating {
+            dependencies {
+                implementation(libs.square.kotlinpoet)
+            }
+        }
+
+        tasks.register<JavaExec>("generatorRun") {
+            group = "run"
+            mainClass = "MainKt"
+            classpath(generator.output)
+            classpath(generator.configurations.runtimeDependencyConfiguration)
+            args(file("src/commonMain/kotlin"))
+        }
+    }
+}
