@@ -1,12 +1,15 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.IntArray
 import kotlin.String
+import kotlin.Suppress
 import kotlin.collections.Collection
 import kotlin.collections.IntIterator
 import kotlin.collections.List
@@ -30,7 +33,7 @@ public value class ImmutableIntArray internal constructor(internal val storage: 
     public constructor(size: Int, `init`: (Int) -> Int) : this(IntArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
-    public operator fun `get`(index: Int): Int = storage[index]
+    @Suppress("detekt:FunctionNaming") public operator fun `get`(index: Int): Int = storage[index]
 
     /** Creates a specialized [IntIterator] for iterating over the elements of the array. */
     public operator fun iterator(): IntIterator = storage.iterator()

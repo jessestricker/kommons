@@ -30,6 +30,9 @@ fun iteratorTypeOf(elementType: ClassName) =
 fun signedTypeOf(unsignedType: ClassName) =
     unsignedType.takeIf { it in UNSIGNED_TYPES }?.peerClass(unsignedType.simpleName.drop(1))
 
+fun suppress(vararg names: String) =
+    AnnotationSpec(Suppress::class.asTypeName()) { addMember("%S", *names) }
+
 class Generator(val elementType: ClassName, val elementPluralName: String) {
     val baseAnnotations =
         if (elementType in UNSIGNED_TYPES)
@@ -84,6 +87,7 @@ class Generator(val elementType: ClassName, val elementPluralName: String) {
                 callThisConstructor(CodeBlock.of("%T(%N, %N)", arrayType, size, init))
             }
             function("get") {
+                addAnnotation(suppress("detekt:FunctionNaming"))
                 addModifiers(KModifier.OPERATOR)
                 val index = parameter("index", INT)
                 addKdoc("Returns the array element at the given [%N].", index)
@@ -395,6 +399,7 @@ class Generator(val elementType: ClassName, val elementPluralName: String) {
                 """
                     .trimMargin()
             )
+            addAnnotation(suppress("detekt:TooManyFunctions"))
 
             addType(immutableArray)
 

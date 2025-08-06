@@ -1,12 +1,15 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
 import kotlin.BooleanArray
 import kotlin.Int
 import kotlin.String
+import kotlin.Suppress
 import kotlin.collections.BooleanIterator
 import kotlin.collections.Collection
 import kotlin.collections.List
@@ -30,6 +33,7 @@ public value class ImmutableBooleanArray internal constructor(internal val stora
     public constructor(size: Int, `init`: (Int) -> Boolean) : this(BooleanArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
+    @Suppress("detekt:FunctionNaming")
     public operator fun `get`(index: Int): Boolean = storage[index]
 
     /** Creates a specialized [BooleanIterator] for iterating over the elements of the array. */

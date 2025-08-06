@@ -1,12 +1,15 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
 import kotlin.ExperimentalUnsignedTypes
 import kotlin.Int
 import kotlin.String
+import kotlin.Suppress
 import kotlin.UByte
 import kotlin.UByteArray
 import kotlin.collections.Collection
@@ -33,7 +36,7 @@ public value class ImmutableUByteArray internal constructor(internal val storage
     public constructor(size: Int, `init`: (Int) -> UByte) : this(UByteArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
-    public operator fun `get`(index: Int): UByte = storage[index]
+    @Suppress("detekt:FunctionNaming") public operator fun `get`(index: Int): UByte = storage[index]
 
     /** Creates a specialized [Iterator<UByte>] for iterating over the elements of the array. */
     public operator fun iterator(): Iterator<UByte> = storage.iterator()

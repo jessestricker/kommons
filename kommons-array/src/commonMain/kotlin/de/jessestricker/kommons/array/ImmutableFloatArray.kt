@@ -1,6 +1,8 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
@@ -8,6 +10,7 @@ import kotlin.Float
 import kotlin.FloatArray
 import kotlin.Int
 import kotlin.String
+import kotlin.Suppress
 import kotlin.collections.Collection
 import kotlin.collections.FloatIterator
 import kotlin.collections.List
@@ -31,7 +34,7 @@ public value class ImmutableFloatArray internal constructor(internal val storage
     public constructor(size: Int, `init`: (Int) -> Float) : this(FloatArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
-    public operator fun `get`(index: Int): Float = storage[index]
+    @Suppress("detekt:FunctionNaming") public operator fun `get`(index: Int): Float = storage[index]
 
     /** Creates a specialized [FloatIterator] for iterating over the elements of the array. */
     public operator fun iterator(): FloatIterator = storage.iterator()

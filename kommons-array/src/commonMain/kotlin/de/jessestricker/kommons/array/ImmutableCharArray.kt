@@ -1,6 +1,8 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
@@ -8,6 +10,7 @@ import kotlin.Char
 import kotlin.CharArray
 import kotlin.Int
 import kotlin.String
+import kotlin.Suppress
 import kotlin.collections.CharIterator
 import kotlin.collections.Collection
 import kotlin.collections.List
@@ -31,7 +34,7 @@ public value class ImmutableCharArray internal constructor(internal val storage:
     public constructor(size: Int, `init`: (Int) -> Char) : this(CharArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
-    public operator fun `get`(index: Int): Char = storage[index]
+    @Suppress("detekt:FunctionNaming") public operator fun `get`(index: Int): Char = storage[index]
 
     /** Creates a specialized [CharIterator] for iterating over the elements of the array. */
     public operator fun iterator(): CharIterator = storage.iterator()

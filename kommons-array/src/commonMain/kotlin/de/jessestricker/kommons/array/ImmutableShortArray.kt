@@ -1,6 +1,8 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
@@ -8,6 +10,7 @@ import kotlin.Int
 import kotlin.Short
 import kotlin.ShortArray
 import kotlin.String
+import kotlin.Suppress
 import kotlin.collections.Collection
 import kotlin.collections.List
 import kotlin.collections.ShortIterator
@@ -31,7 +34,7 @@ public value class ImmutableShortArray internal constructor(internal val storage
     public constructor(size: Int, `init`: (Int) -> Short) : this(ShortArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
-    public operator fun `get`(index: Int): Short = storage[index]
+    @Suppress("detekt:FunctionNaming") public operator fun `get`(index: Int): Short = storage[index]
 
     /** Creates a specialized [ShortIterator] for iterating over the elements of the array. */
     public operator fun iterator(): ShortIterator = storage.iterator()

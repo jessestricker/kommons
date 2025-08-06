@@ -1,12 +1,15 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
 import kotlin.ExperimentalUnsignedTypes
 import kotlin.Int
 import kotlin.String
+import kotlin.Suppress
 import kotlin.UShort
 import kotlin.UShortArray
 import kotlin.collections.Collection
@@ -33,6 +36,7 @@ public value class ImmutableUShortArray internal constructor(internal val storag
     public constructor(size: Int, `init`: (Int) -> UShort) : this(UShortArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
+    @Suppress("detekt:FunctionNaming")
     public operator fun `get`(index: Int): UShort = storage[index]
 
     /** Creates a specialized [Iterator<UShort>] for iterating over the elements of the array. */

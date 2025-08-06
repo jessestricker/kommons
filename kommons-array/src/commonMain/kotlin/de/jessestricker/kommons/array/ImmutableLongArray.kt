@@ -1,6 +1,8 @@
 //
 // NOTE: This file is auto-generated and may not be edited manually.
 //
+@file:Suppress("detekt:TooManyFunctions")
+
 package de.jessestricker.kommons.array
 
 import kotlin.Boolean
@@ -8,6 +10,7 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.LongArray
 import kotlin.String
+import kotlin.Suppress
 import kotlin.collections.Collection
 import kotlin.collections.List
 import kotlin.collections.LongIterator
@@ -31,7 +34,7 @@ public value class ImmutableLongArray internal constructor(internal val storage:
     public constructor(size: Int, `init`: (Int) -> Long) : this(LongArray(size, `init`))
 
     /** Returns the array element at the given [index]. */
-    public operator fun `get`(index: Int): Long = storage[index]
+    @Suppress("detekt:FunctionNaming") public operator fun `get`(index: Int): Long = storage[index]
 
     /** Creates a specialized [LongIterator] for iterating over the elements of the array. */
     public operator fun iterator(): LongIterator = storage.iterator()
